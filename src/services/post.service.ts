@@ -1,5 +1,6 @@
 import { ForbiddenException } from "@/exceptions/exceptions.js";
-import type { Post, PostForCreation, PostForUpdate, PostRepository } from "@/repositories/posts.repository.interface.js";
+import type { Post, PostForCreation, PostForUpdate, PostQueryOptions, PostRepository } from "@/repositories/posts.repository.interface.js";
+import { openSync } from "fs";
 
 export class PostService {
     private postRepository: PostRepository;
@@ -20,6 +21,10 @@ export class PostService {
     async update(id: number, body: PostForUpdate, authorId: number): Promise<Post | null> {
         await this.validatePostOwner(id, authorId);
         return await this.postRepository.update(id, body);
+    }
+
+    async getMany(options: PostQueryOptions): Promise<Post[]> {
+        return await this.postRepository.getMany(options);
     }
 
     private async validatePostOwner(id: number, authorId: number): Promise<void> {
