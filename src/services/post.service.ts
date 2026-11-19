@@ -1,5 +1,5 @@
 import { ForbiddenException } from "@/exceptions/exceptions.js";
-import type { Post, PostForCreation, PostRepository } from "@/repositories/posts.repository.interface.js";
+import type { Post, PostForCreation, PostForUpdate, PostRepository } from "@/repositories/posts.repository.interface.js";
 
 export class PostService {
     private postRepository: PostRepository;
@@ -13,8 +13,17 @@ export class PostService {
     }
 
     async delete(id: number, authorId: number): Promise<void> {
+        await this.validatePostOwner(id, authorId);
+        await this.postRepository.delete(id);
+    }
+
+    async update(id: number, body: PostForUpdate, authorId: number): Promise<Post | null> {
+        await this.validatePostOwner(id, authorId);
+        return await this.postRepository.update(id, body);
+    }
+
+    private async validatePostOwner(id: number, authorId: number): Promise<void> {
         const post = await this.postRepository.getById(id);
         if (post?.authorId !== authorId) throw new ForbiddenException("You are not allowed to modify this post.");
-        await this.postRepository.delete(id);
     }
 }
