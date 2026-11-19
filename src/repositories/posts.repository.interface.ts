@@ -10,6 +10,12 @@ export interface Post {
 
 export type PostForCreation = Pick<Post, "title" | "body" | "authorId">;
 
+export type PostQueryOptions = {
+    skip: number,
+    take: number,
+}
+
 export interface PostRepository {
-    create(post: PostForCreation): Promise<Post>;
+    create (post   : PostForCreation ): Promise<Post>;
+    getMany(options: PostQueryOptions): Promise<Post[]>;
 }
