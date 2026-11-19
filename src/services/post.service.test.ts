@@ -17,14 +17,13 @@ describe("Test Posts service", () => {
     });
 
     test("user can successfully create a post", async () => {
-        await postService.create(createMockupPost(AUTHOR_ID));
-        
-        expect((await postRepository.getMany()).length).toBe(1);
+        const {id} = await postService.create(createMockupPost(AUTHOR_ID));
+        expect((await postRepository.getById(id))).not.toBeNull();
     })
 
-    test.todo("owner can successfully delete a post", async () => {
+    test("owner can successfully delete a post", async () => {
         const {id} = await postService.create(createMockupPost(AUTHOR_ID));        
-        await postService.delete(id)
+        await postService.delete(id);
         expect((await postRepository.getById(id))).toBeNull();
     })
 
