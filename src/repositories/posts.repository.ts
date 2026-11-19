@@ -5,7 +5,7 @@ export class InMemoryPostRepository implements PostRepository {
 
     private currentId: number = 1;
 
-    create(post: PostForCreation): Post {
+    async create(post: PostForCreation): Promise<Post> {
         const createdPost = {
             ...post,
             id       : this.currentId,

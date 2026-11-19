@@ -11,5 +11,5 @@ export interface Post {
 export type PostForCreation = Pick<Post, "title" | "body" | "authorId">;
 
 export interface PostRepository {
-    create(post: PostForCreation): Post;
+    create(post: PostForCreation): Promise<Post>;
 }
