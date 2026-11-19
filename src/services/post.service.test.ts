@@ -7,7 +7,7 @@ import { ForbiddenException } from "@/exceptions/exceptions.js";
 
 describe("Test Posts service", () => {
     const AUTHOR_ID    : number = 1;
-    const NON_AUTHOR_ID: number = 2;
+    const NON_AUTHOR_ID: number = 2;    
 
     let postService   : PostService;
     let postRepository: InMemoryPostRepository;
@@ -40,39 +40,31 @@ describe("Test Posts service", () => {
     });
 
     describe("update", () => {
+        const MOCKUP_TITLE = "Alan turing is the father of computer science";
+
         test("owner can successfully edit a post", async () => {
-            const oldPost = await postRepository.getById(mockupPostId)
-            expect(oldPost).not.toBeNull();
+            const oldPost     = await getPost(mockupPostId);
+            await postService.update(mockupPostId, { title: MOCKUP_TITLE }, AUTHOR_ID);
+            const updatedPost = await getPost(mockupPostId);   
 
-            const newTitle = "Alan turing is the father of computer science";
-            await postService.update(mockupPostId, {title: newTitle}, AUTHOR_ID);
-
-            const newPost = await postRepository.getById(mockupPostId);
-            expect(newPost).not.toBeNull();
-
-            expect(oldPost).not.toEqual(newPost);
+            expect(oldPost).not.toEqual(updatedPost);
 
             expect(oldPost).toEqual({
-                ...newPost,
+                ...updatedPost,
                 title    : oldPost!.title,
                 updatedAt: oldPost!.updatedAt,
             });
             
-            expect(newPost!.title).toBe("Alan turing is the father of computer science");
-            expect(newPost!.updatedAt.getTime()).toBeGreaterThanOrEqual(oldPost!.updatedAt.getTime());
+            expect(updatedPost.title).toBe("Alan turing is the father of computer science");
+            expect(updatedPost.updatedAt.getTime()).toBeGreaterThanOrEqual(oldPost.updatedAt.getTime());
         })
 
         test("non-owner cannot edit a post", async () => {
-            const oldPost = await postRepository.getById(mockupPostId)
-            expect(oldPost).not.toBeNull();
+            const oldPost     = await getPost(mockupPostId);
+            await expect(postService.update(mockupPostId, { title: MOCKUP_TITLE }, NON_AUTHOR_ID)).rejects.toThrow(ForbiddenException);            
+            const updatedPost = await getPost(mockupPostId);            
 
-            const newTitle = "Alan turing is the father of computer science";
-            await expect(postService.update(mockupPostId, { title: newTitle }, NON_AUTHOR_ID)).rejects.toThrow(ForbiddenException);
-
-            const newPost = await postRepository.getById(mockupPostId);
-            expect(newPost).not.toBeNull();
-
-            expect(oldPost).toEqual(newPost);
+            expect(oldPost).toEqual(updatedPost);
         })        
     });
 
@@ -82,6 +74,13 @@ describe("Test Posts service", () => {
         test.todo("can get posts with a given tag")
         test.todo("can get all tags used by a post")
     });
+    
+    const getPost = async (id: number): Promise<Post> => {
+        const oldPost = await postRepository.getById(mockupPostId)
+        expect(oldPost).not.toBeNull();
+
+        return oldPost!;
+    }
 })
 
 const createMockupPost = (authorId: number): PostForCreation => {
