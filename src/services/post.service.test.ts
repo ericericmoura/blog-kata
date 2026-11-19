@@ -21,7 +21,7 @@ describe("Test Posts service", () => {
             authorId: AUTHOR_ID,
         });
         
-        expect(await postRepository.getAll().length).toBe(1);
+        expect((await postRepository.getMany()).length).toBe(1);
     })
 
     test.todo("owner can successfully delete a post")
