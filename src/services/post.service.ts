@@ -10,4 +10,8 @@ export class PostService {
     async create(post: PostForCreation): Promise<Post> {
         return await this.postRepository.create(post);  
     }
+
+    async delete(id: number): Promise<void> {
+        await this.postRepository.delete(id);
+    }
 }
