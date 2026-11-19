@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "vitest"
+import { assert, beforeEach, describe, expect, test } from "vitest"
 import { PostService } from "./post.service.js";
 import { InMemoryPostRepository } from "@/repositories/posts.repository.js";
 import type { PostForCreation } from "@/repositories/posts.repository.interface.js";
@@ -27,7 +27,12 @@ describe("Test Posts service", () => {
         expect((await postRepository.getById(id))).toBeNull();
     })
 
-    test.todo("non-owner cannot delete a post")
+    test("non-owner cannot delete a post", async () => {
+        const { id } = await postService.create(createMockupPost(AUTHOR_ID));
+        expect(postService.delete(id, NON_AUTHOR_ID)).rejects.toThrow(UnauthorizedException);
+        expect((await postRepository.getById(id))).not.toBeNull();
+    })
+
     test.todo("non-owner cannot edit a post")
 })
 
