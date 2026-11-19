@@ -1,6 +1,6 @@
 import type { Post, PostForCreation, PostRepository } from "@/repositories/posts.repository.interface.js"
 
-export class PostRepositoryInMemory implements PostRepository {
+export class InMemoryPostRepository implements PostRepository {
     private posts: Post[] = [];
 
     private currentId: number = 1;
