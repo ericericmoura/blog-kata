@@ -45,6 +45,7 @@ describe("Test Posts service", () => {
 
     describe("getMany", () => {
         test.todo("can get 10 most recent posts")
+        test.todo("can get 10 oldest posts")
         test.todo("can get posts with a given tag")
         test.todo("can get all tags used by a post")
     });
