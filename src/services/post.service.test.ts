@@ -12,34 +12,59 @@ describe("Test Posts service", () => {
     let postService   : PostService;
     let postRepository: InMemoryPostRepository;
 
-    beforeEach(() => {
+    let mockupPostId: number;
+
+    beforeEach(async () => {
         postRepository = new InMemoryPostRepository();
         postService    = new PostService(postRepository);
-    });
 
+        mockupPostId   = (await postService.create(createMockupPost(AUTHOR_ID))).id;
+    });
+    
     describe("create", () => {
-        test("user can successfully create a post", async () => {
-            const {id} = await postService.create(createMockupPost(AUTHOR_ID));
-            expect((await postRepository.getById(id))).not.toBeNull();
+        test("user can successfully create a post", async () => {            
+            expect((await postRepository.getById(mockupPostId))).not.toBeNull();
         })
     })
 
     describe("delete", () => {
         test("owner can successfully delete a post", async () => {
-            const {id} = await postService.create(createMockupPost(AUTHOR_ID));
-            await postService.delete(id, AUTHOR_ID);
-            expect((await postRepository.getById(id))).toBeNull();
+            await postService.delete(mockupPostId, AUTHOR_ID);
+            expect((await postRepository.getById(mockupPostId))).toBeNull();
         })
 
         test("non-owner cannot delete a post", async () => {
-            const { id } = await postService.create(createMockupPost(AUTHOR_ID));
-            await expect(postService.delete(id, NON_AUTHOR_ID)).rejects.toThrow(ForbiddenException);
-            expect((await postRepository.getById(id))).not.toBeNull();
+            await expect(postService.delete(mockupPostId, NON_AUTHOR_ID)).rejects.toThrow(ForbiddenException);
+            expect((await postRepository.getById(mockupPostId))).not.toBeNull();
         })
     });
 
     describe("update", () => {
-        test.todo("owner can successfully edit a post")
+        test("owner can successfully edit a post", async () => {
+            const oldPost = await postRepository.getById(mockupPostId);
+            expect(oldPost).not.toBeNull();
+
+            const newTitle = "Alan turing is the father of computer science";
+            await postService.update(mockupPostId, {title: newTitle}, AUTHOR_ID);
+
+            const newPost = await postRepository.getById(mockupPostId);
+            expect(newPost).not.toBeNull();
+
+            // garantee correct fields change
+            expect(oldPost).not.toEqual(newPost);
+            expect(oldPost!.updatedAt).not.toEqual(newPost!.updatedAt);
+
+            // All other fields should remain unchanged
+            expect(oldPost).toEqual({
+                ...newPost,
+                title    : oldPost!.title,
+                updatedAt: oldPost!.updatedAt,
+            });
+            
+            expect(newPost!.title).toBe("Alan turing is the father of computer science");
+            expect(newPost!.updatedAt.getTime()).toBeGreaterThan(oldPost!.updatedAt.getTime());            
+        })
+
         test.todo("non-owner cannot edit a post")
     });
 
