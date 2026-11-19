@@ -19,10 +19,17 @@ export class InMemoryPostRepository implements PostRepository {
         return createdPost;
     }    
 
-    async getMany(options: PostQueryOptions = {skip: 0, take: 10}): Promise<Post[]> {
-        let { skip, take } = options;
-        let end: number = skip + take;        
-        return Array.from(this.posts.values()).slice(skip, end);
+    async getMany(options: PostQueryOptions): Promise<Post[]> {
+        let { skip, limit } = options;
+        skip  = skip  ?? 0;
+        limit = limit ?? 10;
+
+        let end: number = skip + limit;
+        let sortFn: ((a: Post, b: Post) => number) | undefined;
+        if (options.orderBy !== undefined) {
+            if (options.orderBy.createdAt) sortFn = (a, b) => a.createdAt.getTime() - b.createdAt.getTime();
+        }
+        return Array.from(this.posts.values()).sort(sortFn).slice(skip, end);
     }
 
     async getById(id: number): Promise<Post | null> {
