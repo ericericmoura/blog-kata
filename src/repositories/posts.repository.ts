@@ -41,10 +41,11 @@ export class InMemoryPostRepository implements PostRepository {
         const { authorId, body, isActive, title } = postUpdate;
         post = {
             ...post,
-            title   : title    ?? post.title,
-            body    : body     ?? post.body,
-            authorId: authorId ?? post.authorId,
-            isActive: isActive ?? post.isActive,
+            title    : title    ?? post.title,
+            body     : body     ?? post.body,
+            authorId : authorId ?? post.authorId,
+            isActive : isActive ?? post.isActive,
+            updatedAt: new Date(),
         }
         this.posts.set(id, post);
         return post;
