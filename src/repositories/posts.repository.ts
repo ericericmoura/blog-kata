@@ -1,7 +1,6 @@
 import type { Post, PostForCreation, PostQueryOptions, PostRepository } from "@/repositories/posts.repository.interface.js"
 
 export class InMemoryPostRepository implements PostRepository {    
-    // private posts: Post[] = [];
     private posts: Map<number, Post> = new Map();
 
     private currentId: number = 1;
