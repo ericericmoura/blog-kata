@@ -1,7 +1,5 @@
 import type { Post, PostForCreation, PostRepository } from "@/repositories/posts.repository.interface.js";
 
-export type PostDTO = Omit<Post, "id">
-
 export class PostService {
     private postRepository: PostRepository;
 
@@ -9,7 +7,7 @@ export class PostService {
         this.postRepository = postRepository;
     }
 
-    async create(post: PostForCreation): Promise<PostDTO> {
+    async create(post: PostForCreation): Promise<Post> {
         return await this.postRepository.create(post);  
     }
 }
