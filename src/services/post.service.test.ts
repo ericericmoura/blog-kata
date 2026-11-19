@@ -22,12 +22,11 @@ describe("Test Posts service", () => {
     })
 
     test("owner can successfully delete a post", async () => {
-        const {id} = await postService.create(createMockupPost(AUTHOR_ID));        
-        await postService.delete(id);
+        const {id} = await postService.create(createMockupPost(AUTHOR_ID));
+        await postService.delete(id, AUTHOR_ID);
         expect((await postRepository.getById(id))).toBeNull();
     })
 
-    test.todo("owner can Successfully edit a post")
     test.todo("non-owner cannot delete a post")
     test.todo("non-owner cannot edit a post")
 })
