@@ -18,6 +18,6 @@ export type PostQueryOptions = {
 export interface PostRepository {
     create (post   : PostForCreation ): Promise<Post>;
     getMany(options: PostQueryOptions): Promise<Post[]>;
-    getById(id: number): Promise<Post>
+    getById(id: number): Promise<Post | null>
     delete (id: number): Promise<void>
 }
