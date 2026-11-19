@@ -9,9 +9,7 @@ export class PostService {
         this.postRepository = postRepository;
     }
 
-    async create(title: string, body: string, authorId: number): Promise<PostDTO> {
-        const  post  : PostForCreation = {title, body, authorId};
-        const  result: PostDTO = await this.postRepository.create(post);
-        return result;
+    async create(post: PostForCreation): Promise<PostDTO> {
+        return await this.postRepository.create(post);  
     }
 }
