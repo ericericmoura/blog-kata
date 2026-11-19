@@ -1,3 +1,5 @@
+import type { SortOption } from "@/types/querying.types.js";
+
 export interface Post {
     id       : number,
     title    : string,
@@ -13,9 +15,14 @@ type BasePostInfo = "title" | "body" | "authorId";
 export type PostForCreation = Pick<Post, BasePostInfo>;
 export type PostForUpdate   = Partial<Pick<Post, BasePostInfo | "isActive">>;
 
+export type PostOrderingOptions = {
+    createdAt: SortOption,
+}
+
 export type PostQueryOptions = {
-    skip: number,
-    take: number,
+    skip   ?: number,
+    limit  ?: number,
+    orderBy?: PostOrderingOptions,
 }
 
 export interface PostRepository {
