@@ -1,4 +1,4 @@
-import type { Post, PostForCreation, PostQueryOptions, PostRepository } from "@/repositories/posts.repository.interface.js"
+import type { Post, PostForCreation, PostForUpdate, PostQueryOptions, PostRepository } from "@/repositories/posts.repository.interface.js"
 
 export class InMemoryPostRepository implements PostRepository {    
     private posts: Map<number, Post> = new Map();
@@ -31,5 +31,22 @@ export class InMemoryPostRepository implements PostRepository {
 
     async delete(id: number): Promise<void> {
         this.posts.delete(id);
+    }
+
+    async update(id: number, postUpdate: PostForUpdate): Promise<Post | null> {
+        let post = this.posts.get(id);
+        if (!post) {
+            return null;
+        }
+        const { authorId, body, isActive, title } = postUpdate;
+        post = {
+            ...post,
+            title   : title    ?? post.title,
+            body    : body     ?? post.body,
+            authorId: authorId ?? post.authorId,
+            isActive: isActive ?? post.isActive,
+        }
+        this.posts.set(id, post);
+        return post;
     }
 }
