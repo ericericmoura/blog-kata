@@ -2,10 +2,10 @@ import { beforeEach, describe, expect, test } from "vitest"
 
 describe("Test Posts service", () => {
     let postService   : PostService;
-    let postRepository: InMemoryRepository;
+    let postRepository: InMemoryPostRepository;
 
     beforeEach(() => {
-        postRepository = new InMemoryRepository();
+        postRepository = new InMemoryPostRepository();
         postService    = new PostService(postRepository);
     });
 
