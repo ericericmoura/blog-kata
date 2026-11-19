@@ -19,10 +19,7 @@ export class InMemoryPostRepository implements PostRepository {
 
     async getMany(options: PostQueryOptions = {skip: 0, take: 10}): Promise<Post[]> {
         let { skip, take } = options;
-        skip = Math.max(skip, this.posts.length);
-        take = Math.min(take, this.posts.length-skip);
-
-        const  result = this.posts.slice(skip, skip+take);
-        return result;
+        let end: number = skip + take;        
+        return this.posts.slice(skip, end);
     }
 }
