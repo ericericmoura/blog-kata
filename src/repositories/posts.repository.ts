@@ -27,7 +27,9 @@ export class InMemoryPostRepository implements PostRepository {
         let end: number = skip + limit;
         let sortFn: ((a: Post, b: Post) => number) | undefined;
         if (options.orderBy !== undefined) {
-            if (options.orderBy.createdAt) sortFn = (a, b) => a.createdAt.getTime() - b.createdAt.getTime();
+            if (options.orderBy.createdAt) sortFn = (a, b) => 
+                options.orderBy?.createdAt === "asc" ? a.createdAt.getTime() - b.createdAt.getTime() 
+                                                     : b.createdAt.getTime() - a.createdAt.getTime();
         }
         return Array.from(this.posts.values()).sort(sortFn).slice(skip, end);
     }
