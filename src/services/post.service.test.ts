@@ -98,7 +98,18 @@ describe("Test Posts service", () => {
                 }
             })
     
-            test.todo("reads 10 oldest posts")
+            test("reads 10 oldest posts", async () => {
+                const posts = await postService.getMany({
+                    orderBy: { createdAt: "asc" },
+                    limit: 10,
+                });
+
+                expect(posts.length).toBe(10);
+                for (let i = 0; i < posts.length - 1; i++) {
+                    expect(posts[i]!.createdAt.getTime()).toBeLessThanOrEqual(posts[i + 1]!.createdAt.getTime());
+                }
+            });
+
             test.todo("reads all posts with a given tag")
             test.todo("reads all tags used by a post")
         });
