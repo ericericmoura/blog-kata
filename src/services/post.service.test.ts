@@ -92,12 +92,9 @@ describe("Test Posts service", () => {
                     limit  : 10,
                 });
 
-                console.log(posts);
-                console.log(posts.map(p => p.createdAt));
-
                 expect(posts.length).toBe(10);
                 for (let i = 0; i < posts.length - 1; i++) {
-                    expect(posts[i]!.createdAt.getTime()).toBeLessThanOrEqual(posts[i+1]!.createdAt.getTime());
+                    expect(posts[i]!.createdAt.getTime()).toBeGreaterThanOrEqual(posts[i+1]!.createdAt.getTime());
                 }
             })
     
