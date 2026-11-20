@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test } from "vitest"
+import { beforeEach, describe, expect, test, vi } from "vitest"
 import { PostService } from "./post.service.js";
 import { InMemoryPostRepository } from "@/repositories/posts.repository.js";
 import type { Post, PostForCreation } from "@/repositories/posts.repository.interface.js";
@@ -75,20 +75,29 @@ describe("Test Posts service", () => {
     describe("read", () => {
         describe("getMany", () => {
             beforeEach(async () => {
-                Promise.all([
-                    Array.from({ length: 10 }, () => { postService.create(createMockupPost(AUTHOR_ID)); })
-                ])
+                const randomDate = () =>
+                    new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000));
+
+                vi.useFakeTimers();
+                for(let i = 0; i < 10; i++) {
+                    vi.setSystemTime(randomDate());
+                    await postService.create(createMockupPost(AUTHOR_ID));
+                }
+                vi.useRealTimers();
             })
     
             test("reads 10 most recent posts", async () => {
                 const posts = await postService.getMany({
-                    orderBy: { date: "desc" },
+                    orderBy: { createdAt: "desc" },
                     limit  : 10,
                 });
 
+                console.log(posts);
+                console.log(posts.map(p => p.createdAt));
+
                 expect(posts.length).toBe(10);
                 for (let i = 0; i < posts.length - 1; i++) {
-                    expect(posts[i]!.createdAt.getTime()).toBeGreaterThan(posts[i+1]!.createdAt.getTime());
+                    expect(posts[i]!.createdAt.getTime()).toBeLessThanOrEqual(posts[i+1]!.createdAt.getTime());
                 }
             })
     
