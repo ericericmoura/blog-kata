@@ -28,6 +28,20 @@ describe("Test Posts service", () => {
             test("user can successfully create a post", async () => {
                 expect((await postRepository.getById(mockupPostId))).not.toBeNull();
             })
+            
+            test("user can successfully create a post with a tag", async () => {
+                const id = (await postService.create(createMockupPost(AUTHOR_ID, ["literature"]))).id;
+
+                expect((await postRepository.getById(id))).not.toBeNull();
+                expect((await postRepository.getById(id, {includeTags: true})).tags.length).toBe(1);
+            })
+
+            test("user can successfully create a post with multiple tags", async () => {
+                const id = (await postService.create(createMockupPost(AUTHOR_ID, ["literature", "culture", "music"]))).id;
+
+                expect((await postRepository.getById(id))).not.toBeNull();
+                expect((await postRepository.getById(id, { includeTags: true })).tags.length).toBe(3);
+            })
         })
 
         describe("delete", () => {
