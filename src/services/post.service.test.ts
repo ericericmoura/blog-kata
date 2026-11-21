@@ -78,7 +78,7 @@ describe("Test Posts service", () => {
                 const randomDate = () =>
                     new Date(Date.now() - Math.floor(Math.random() * 365 * 24 * 60 * 60 * 1000));
 
-                const tags: string[][] = new Array(10).fill("news");
+                const tags: string[][] = new Array(10).fill(["news"]);
                 tags[0] = ["literature"];
                 tags[1] = ["culture", "literature"];
                 tags[2] = ["literature"];
@@ -89,7 +89,7 @@ describe("Test Posts service", () => {
                 vi.useFakeTimers();
                 for (let i = 0; i < 10; i++) {
                     vi.setSystemTime(randomDate());
-                    await postService.create(createMockupPost(AUTHOR_ID, [tags[i]!]));
+                    await postService.create(createMockupPost(AUTHOR_ID, tags[i]));
                 }
                 vi.useRealTimers();
             })
@@ -118,7 +118,7 @@ describe("Test Posts service", () => {
                 }
             });
 
-            test.todo("reads all posts with a given tag", async () => {
+            test("reads all posts with a given tag", async () => {
                 const literatureCulturePosts = await postService.getMany({tags: ["culture", "literature"]});
                 expect(literatureCulturePosts.length).toBe(2);
 
@@ -143,6 +143,6 @@ const createMockupPost = (authorId: number, tags?: string[]): PostForCreation =>
         title: faker.book.title(),
         body: faker.lorem.paragraph(3),
         authorId,
-        tags,
+        ...(tags && { tags }),
     };
 }
