@@ -1,12 +1,13 @@
 import { faker } from "@faker-js/faker";
 import { beforeEach, describe, expect, test } from "vitest";
 import { AUTHOR_ID, getMockupPostForCreation } from "@/mockups/post.mockup.js";
+import { PrismaPostRepository } from "./posts.repository.js";
 
 describe("Posts Repository", () => {
-    const repository: PrismaPostsRepository;
+    let repository: PrismaPostRepository;
 
     beforeEach(() => {
-        repository = new PrismaPostsRepository();
+        repository = new PrismaPostRepository();
     })
 
     test("creates a post with a tag", async () => {
