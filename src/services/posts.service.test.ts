@@ -1,13 +1,10 @@
 import { beforeEach, describe, expect, test, vi, type Mocked } from "vitest"
 import { PostService } from "./posts.service.js";
-import type { Post, PostRepository } from "@/repositories/posts.repository.interface.js";
-import { faker } from '@faker-js/faker';
+import type { PostRepository } from "@/repositories/posts.repository.interface.js";
 import { ForbiddenException } from "@/exceptions/exceptions.js";
+import { AUTHOR_ID, getMockupPost, NON_AUTHOR_ID } from "@/mockups/post.mockup.js";
 
-describe("Test Posts service", () => {
-    const AUTHOR_ID: number = 1;
-    const NON_AUTHOR_ID: number = 2;
-
+describe("Posts service", () => {
     let postService: PostService;
     let postRepository: Mocked<PostRepository>;
 
@@ -26,7 +23,7 @@ describe("Test Posts service", () => {
 
     describe("delete, update", () => {
         beforeEach(async () => {
-            postRepository.getById.mockResolvedValueOnce(createMockupPost(AUTHOR_ID, 1));
+            postRepository.getById.mockResolvedValueOnce(getMockupPost(AUTHOR_ID, 1));
             mockupPostId = 1;
         })
 
@@ -59,16 +56,3 @@ describe("Test Posts service", () => {
         });
     })
 })
-
-const createMockupPost = (authorId: number, id: number, tags?: string[]): Post => {
-    return {
-        id,
-        isActive: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        title: faker.book.title(),
-        body: faker.lorem.paragraph(3),
-        authorId,
-        ...(tags && { tags }),
-    };
-}
