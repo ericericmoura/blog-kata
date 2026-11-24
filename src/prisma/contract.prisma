@@ -1,0 +1,41 @@
+// use prisma-8
+
+model Users {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  username      String    @unique
+  password_hash String
+  is_active     Boolean   @default(true)
+  createdAt     DateTime  @onCreate(now())
+  updatedAt     DateTime  @onUpdate(now())
+  posts         Posts[]
+}
+
+model Posts {
+  id        Int       @id @default(autoincrement())
+  title     String
+  body      String
+  authorId  Int
+  author    Users     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @onCreate(now())
+  updatedAt DateTime  @onUpdate(now())
+}
+
+model PostTags {
+  id        Int       @id @default(autoincrement())
+  postId    Int
+  post      Posts     @relation(fields: [postId]  , references: [id], onDelete: Cascade)
+  authorId  Int
+  author    Users     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @onCreate(now())
+  updatedAt DateTime  @onUpdate(now())
+
+  @@unique([postId, authorId])
+}
+
+model Tags {
+  id        Int       @id @default(autoincrement())
+  tag       String    @unique
+  createdAt DateTime  @onCreate(now())
+  updatedAt DateTime  @onUpdate(now())
+}
