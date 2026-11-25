@@ -4,11 +4,10 @@ import { getMockupUserForCreation } from "@/mockups/user.mockup";
 import { db } from "@/prisma/db";
 
 describe("User Repository", () => {
-    let userRepository: PrismaUserRepository;
+    let userRepository = new PrismaUserRepository();
 
     beforeEach(async () => {
         await db.orm.public.Users.where({}).deleteAll();
-        userRepository = new PrismaUserRepository();        
     })
 
     test("creates an user", async () => {
