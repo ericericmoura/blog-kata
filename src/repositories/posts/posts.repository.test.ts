@@ -21,29 +21,43 @@ describe("Posts Repository", () => {
         authorId = (await usersRepository.create(getMockupUserForCreation())).id;
     })
 
-    test("creates a post with a tag", async () => {
-        const { created, input } = await createPost(authorId, ["literature", "culture", "horror", "action"]);
+    describe("create", () => {
+        test("creates a post with a tag", async () => {
+            const { created, input } = await createPost(authorId, ["literature", "culture", "horror", "action"]);
 
-        const saved = await getPost(created.id, true);
-        expect(saved).not.toBeNull();
+            const saved = await getPost(created.id, true);
+            expect(saved).not.toBeNull();
 
-        expect(saved).toMatchObject(expect.objectContaining({
-            ...input,
-            tags: input.tags?.map(t => ({ tag: t }))
-        }));        
-    });
+            expect(saved).toMatchObject(expect.objectContaining({
+                ...input,
+                tags: input.tags?.map(t => ({ tag: t }))
+            }));
+        });
 
-    test("creates a post with multiple tags", async () => {
-        const { created, input } = await createPost(authorId, ["literature", "culture", "horror", "action"]);
+        test("creates a post with multiple tags", async () => {
+            const { created, input } = await createPost(authorId, ["literature", "culture", "horror", "action"]);
 
-        const saved = await getPost(created.id, true);
-        expect(saved).not.toBeNull();
+            const saved = await getPost(created.id, true);
+            expect(saved).not.toBeNull();
 
-        expect(saved).toMatchObject(expect.objectContaining({
-            ...input,
-            tags: input.tags?.map(t => ({ tag: t }))
-        }));
-    });
+            expect(saved).toMatchObject(expect.objectContaining({
+                ...input,
+                tags: input.tags?.map(t => ({ tag: t }))
+            }));
+        });
+
+        test("creates a post with no tags", async () => {
+            const { created, input } = await createPost(authorId);
+
+            const saved = await getPost(created.id, true);
+            expect(saved).not.toBeNull();
+
+            expect(saved).toMatchObject(expect.objectContaining({
+                ...input,
+                tags: input.tags?.map(t => ({ tag: t })) ?? []
+            }));
+        });
+    })
 
     test.todo("deletes a post");
     test.todo("edits a post");
