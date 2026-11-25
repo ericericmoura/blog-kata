@@ -4,17 +4,19 @@ import { AUTHOR_ID, getMockupPostForCreation } from "@/mockups/post.mockup.js";
 import { PrismaPostRepository } from "./posts.repository.js";
 
 describe("Posts Repository", () => {
-    let repository: PrismaPostRepository;
+    let postsRepository: PrismaPostRepository;
+    let usersRepository: PrismaUserRepository;
 
-    beforeEach(() => {
-        repository = new PrismaPostRepository();
+    beforeEach(async () => {
+        postsRepository = new PrismaPostRepository();
+        await usersRepository.create(getMockupUserForCreation(AUTHOR_ID));
     })
 
     test("creates a post with a tag", async () => {
         const post = getMockupPostForCreation(AUTHOR_ID, ["literature"]);
-        const {id} = await repository.create(post);
+        const {id} = await postsRepository.create(post);
 
-        const saved = await repository.getById(id);
+        const saved = await postsRepository.getById(id, { includes: { tags: true } });
         expect(saved).not.toBeNull();
         expect(saved).toMatchObject(post);
     });

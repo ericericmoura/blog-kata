@@ -4,7 +4,9 @@ import * as z from "zod";
 dotenv.config();
 
 const envSchema = z.object({
-    DATABASE_URL: z.url(),
+    TEST_DATABASE_URL: z.url(),
+    DATABASE_URL     : z.url(),
+    TESTING          : z.boolean().default(false),
 })
 
 const result = envSchema.safeParse(process.env);
