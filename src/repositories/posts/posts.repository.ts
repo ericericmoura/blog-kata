@@ -1,18 +1,17 @@
 import { db } from "@/prisma/db.js";
 import type { Post, PostForCreation, PostForUpdate, PostQueryOptions, PostRepository } from "./posts.repository.interface.js";
+import type { PostgresTransactionContext } from "@prisma/orm-postgres/runtime";
+import type { Contract } from "@/prisma/contract.js";
+import type { NoCollectionClasses } from "@prisma/orm-postgres/orm-client";
 
 export class PrismaPostRepository implements PostRepository {
     async create(post: PostForCreation): Promise<Post> {    
         const result = await db.transaction(async (tx) => {            
-            const tagsObject = (post.tags ?? []).map((tag) => ({ tag }));
+            const tagsObject = this.parseTags(post.tags);
             const hasTags = tagsObject.length > 0;
 
             if (hasTags) {
-                await tx.orm.public.Tags.createAndCount(tagsObject,
-                    {
-                        onConflict: "skip" ,
-                        conflictOn: ["tag"],
-                });
+                await this.createTagsForPost(post.tags!, tx);
             }
 
             const newPost = await tx.orm.public.Posts.create({                
@@ -41,7 +40,7 @@ export class PrismaPostRepository implements PostRepository {
     
     async update(id: number, postUpdate: PostForUpdate): Promise<Post | null> {
         return db.transaction(async (tx) => {            
-            const tagsObject = (postUpdate.tags ?? []).map((tag) => ({ tag }));
+            const tagsObject = this.parseTags(postUpdate.tags);
             const hasTags    = tagsObject.length > 0;
 
             if (hasTags) {
@@ -50,11 +49,7 @@ export class PrismaPostRepository implements PostRepository {
                     .where(pt => pt.tag.some(t => t.tag.notIn(postUpdate.tags!)))
                     .deleteAll();
                 
-                await tx.orm.public.Tags.createAndCount(tagsObject,
-                    {
-                        onConflict: "skip",
-                        conflictOn: ["tag"],
-                    });
+                await this.createTagsForPost(postUpdate.tags!, tx);
             }
 
             const updated = await tx.orm.public.Posts.where({ id }).include("tags", t => t.select("tag")).update({
@@ -71,4 +66,18 @@ export class PrismaPostRepository implements PostRepository {
             };
         })
     }
+
+    async createTagsForPost(tags: string[], tx: PostgresTransactionContext<Contract, NoCollectionClasses>) {
+        const tagsObject = tags.map((tag) => ({ tag }));
+        
+        await tx.orm.public.Tags.createAndCount(tagsObject,
+            {
+                onConflict: "skip",
+                conflictOn: ["tag"],
+            });            
+    }
+
+    parseTags(tags: string[] | undefined): { tag: string }[] {
+        return (tags ?? []).map((tag) => ({ tag }));
+    }    
 }
