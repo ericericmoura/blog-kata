@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test, vi, type Mocked } from "vitest"
 import { PostService } from "./posts.service.js";
-import type { PostRepository } from "@/repositories/posts.repository.interface.js";
+import type { PostRepository } from "@/repositories/posts/posts.repository.interface.js";
 import { ForbiddenException } from "@/exceptions/exceptions.js";
 import { AUTHOR_ID, getMockupPost, NON_AUTHOR_ID } from "@/mockups/post.mockup.js";
 
