@@ -18,7 +18,7 @@ import type {
 } from '@prisma/orm-postgres/contract-types';
 
 export type StorageHash =
-  StorageHashBase<'62597d5e76d2564dd700930a23ac0ba8c921d4735d2e4f242793383c0633ed7d'>;
+  StorageHashBase<'09d563962b21e6562f75779ba87403e4bf2755ee6e35ab6b85e297644ec9f3e5'>;
 export type ExecutionHash =
   ExecutionHashBase<'c52b465333827f1d9a8100c19215a4acca3e742d31d7835b7177c7accc051607'>;
 export type ProfileHash =
@@ -318,6 +318,7 @@ export namespace Models {
     body: FieldOutputTypes['public']['Posts']['body'];
     createdAt: FieldOutputTypes['public']['Posts']['createdAt'];
     id: FieldOutputTypes['public']['Posts']['id'];
+    isActive: FieldOutputTypes['public']['Posts']['isActive'];
     title: FieldOutputTypes['public']['Posts']['title'];
     updatedAt: FieldOutputTypes['public']['Posts']['updatedAt'];
     author: public_Users;
@@ -474,6 +475,16 @@ type ContractBase = Omit<
                   readonly default: {
                     readonly kind: 'function';
                     readonly expression: 'autoincrement()';
+                  };
+                  readonly many: false;
+                };
+                readonly isActive: {
+                  readonly dataType: 'pg/bool';
+                  readonly codecId: 'pg/bool@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'literal';
+                    readonly value: DefaultLiteralValue<'pg/bool@1', true>;
                   };
                   readonly many: false;
                 };
@@ -722,6 +733,10 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
               };
+              readonly isActive: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/bool@1' };
+              };
               readonly title: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
@@ -772,6 +787,7 @@ type ContractBase = Omit<
                 readonly body: { readonly column: 'body' };
                 readonly createdAt: { readonly column: 'createdAt' };
                 readonly id: { readonly column: 'id' };
+                readonly isActive: { readonly column: 'isActive' };
                 readonly title: { readonly column: 'title' };
                 readonly updatedAt: { readonly column: 'updatedAt' };
               };

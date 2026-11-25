@@ -17,6 +17,7 @@ model Posts {
   body      String
   authorId  Int
   author    Users     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  isActive  Boolean   @default(true)
   createdAt DateTime  @default(now()) @onCreate(now())
   updatedAt temporal.UpdatedAt
   tags      Tags[]
