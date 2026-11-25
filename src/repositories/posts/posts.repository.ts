@@ -26,8 +26,19 @@ export class PrismaPostRepository implements PostRepository {
         return result as Post;
     }
 
-    getMany(options: PostQueryOptions): Promise<Post[]> {
-        throw new Error("Method not implemented.");
+    async getMany(options: PostQueryOptions): Promise<Post[]> {
+        const createdAtDesc = (options.orderBy?.createdAt ?? "desc") === "desc";
+
+        let result = await db.orm.public.Posts
+            .limit (options.limit ?? 10)
+            .offset(options.skip  ?? 0 )
+            .orderBy([
+                (p) => (createdAtDesc ? p.createdAt.desc() : p.createdAt.asc()),
+                (p) => (createdAtDesc ? p.id.desc()        : p.id.asc()       ),
+            ])
+            .all();
+        
+        return result;
     }
 
     getById(id: number): Promise<Post | null> {
