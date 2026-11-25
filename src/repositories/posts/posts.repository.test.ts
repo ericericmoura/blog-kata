@@ -4,6 +4,7 @@ import { PrismaPostRepository } from "./posts.repository.js";
 import { PrismaUserRepository } from "../users/user.repository.js";
 import { getMockupUserForCreation } from "@/mockups/user.mockup.js";
 import { db } from "@/prisma/db.js";
+import type { Post, PostForCreation } from "./posts.repository.interface.js";
 
 describe("Posts Repository", () => {
     let postsRepository = new PrismaPostRepository();
@@ -21,23 +22,46 @@ describe("Posts Repository", () => {
     })
 
     test("creates a post with a tag", async () => {
-        const post = getMockupPostForCreation(authorId, ["literature"]);
-        const { id } = await postsRepository.create(post);
+        const { created, input } = await createPost(authorId, ["literature", "culture", "horror", "action"]);
 
-        const saved = await db.orm.public.Posts.where({ id }).include("tags", (t) => t.select("tag")).first();
+        const saved = await getPost(created.id, true);
         expect(saved).not.toBeNull();
 
         expect(saved).toMatchObject(expect.objectContaining({
-            ...post,
-            tags: post.tags?.map(t => ({ tag: t }))
+            ...input,
+            tags: input.tags?.map(t => ({ tag: t }))
         }));        
     });
 
-    test.todo("creates a post with multiple tags");
+    test("creates a post with multiple tags", async () => {
+        const { created, input } = await createPost(authorId, ["literature", "culture", "horror", "action"]);
+
+        const saved = await getPost(created.id, true);
+        expect(saved).not.toBeNull();
+
+        expect(saved).toMatchObject(expect.objectContaining({
+            ...input,
+            tags: input.tags?.map(t => ({ tag: t }))
+        }));
+    });
+
     test.todo("deletes a post");
     test.todo("edits a post");
     test.todo("retrieves 10 most recent posts");
     test.todo("retrieves posts with a given tag");
     test.todo("list all tags used by a post");
     test.todo("correctly paginates posts");
+
+    const createPost = async (authorId: number, tags?: string[]): Promise<{ created: Post, input: PostForCreation }> => {
+        const post = getMockupPostForCreation(authorId, tags);
+        return {created: (await postsRepository.create(post)), input: post};
+    }
+
+    const getPost = async (id: number, includeTags: boolean): Promise<Post | null> => {
+        let query = db.orm.public.Posts.where({ id });
+        if (includeTags) {
+            query = query.include("tags", (t) => t.select("tag"));
+        }
+        return await query.first();
+    }
 })
