@@ -3,22 +3,24 @@ import type { Post, PostForCreation, PostForUpdate, PostQueryOptions, PostReposi
 
 export class PrismaPostRepository implements PostRepository {
     async create(post: PostForCreation): Promise<Post> {    
-        const result = await db.transaction(async (tx) => {
-            const tagIds: number[] = [];
-            if (post.tags !== undefined) {
-                for (const tag of post.tags) {
-                    const existing = await db.orm.public.Tags.where({ tag }).first();
-                    tagIds.push(existing === null ? (await db.orm.public.Tags.create({ tag })).id : existing.id);
-                }
+        const result = await db.transaction(async (tx) => {            
+            const tagsObject = (post.tags ?? []).map((tag) => ({ tag }));
+            const hasTags = tagsObject.length > 0;
+
+            if (post.tags !== undefined && hasTags) {
+                await tx.orm.public.Tags.createAndCount(tagsObject,
+                    {
+                        onConflict: "skip" ,
+                        conflictOn: ["tag"],
+                });
             }
 
-            const newPost = await db.orm.public.Posts.create({                
+            const newPost = await tx.orm.public.Posts.create({                
                 title   : post.title   ,
                 body    : post.body    ,
                 authorId: post.authorId,
+                ...(hasTags && {tags: (t) => t.connect(tagsObject)}),
             })
-
-            await db.orm.public.PostTags.createAll(tagIds.map(t => ({tagId: t, postId: newPost.id})));
 
             return newPost;
         })
@@ -38,6 +40,6 @@ export class PrismaPostRepository implements PostRepository {
     }
     
     async update(id: number, postUpdate: PostForUpdate): Promise<Post | null> {
-        return await db.orm.public.Posts.where({id}).update(postUpdate);
+        throw new Error("Method not implemented.");
     }
 }
