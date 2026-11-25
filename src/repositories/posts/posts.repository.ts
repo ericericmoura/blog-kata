@@ -7,7 +7,7 @@ export class PrismaPostRepository implements PostRepository {
             const tagsObject = (post.tags ?? []).map((tag) => ({ tag }));
             const hasTags = tagsObject.length > 0;
 
-            if (post.tags !== undefined && hasTags) {
+            if (hasTags) {
                 await tx.orm.public.Tags.createAndCount(tagsObject,
                     {
                         onConflict: "skip" ,
@@ -40,6 +40,32 @@ export class PrismaPostRepository implements PostRepository {
     }
     
     async update(id: number, postUpdate: PostForUpdate): Promise<Post | null> {
-        throw new Error("Method not implemented.");
+        return db.transaction(async (tx) => {            
+            const tagsObject = (postUpdate.tags ?? []).map((tag) => ({ tag }));
+            const hasTags    = tagsObject.length > 0;
+
+            if (hasTags) {
+                await db.orm.public.PostTags.where({ postId: id }).deleteAll();
+                
+                await tx.orm.public.Tags.createAndCount(tagsObject,
+                    {
+                        onConflict: "skip",
+                        conflictOn: ["tag"],
+                    });
+            }
+
+            const updated = await tx.orm.public.Posts.where({ id }).include("tags", t => t.select("tag")).update({
+                ...postUpdate as Omit<PostForUpdate, "tags">,
+                ...(hasTags && { tags: (t) => t.connect(tagsObject) }),
+                updatedAt: new Date(),
+            });
+
+            if (updated === null) return null;
+
+            return {
+                ...updated,
+                tags: updated.tags.map(t => t.tag),
+            };
+        })
     }
 }

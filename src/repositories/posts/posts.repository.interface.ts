@@ -14,7 +14,7 @@ export interface Post {
 type BasePostInfo = "title" | "body" | "authorId";
 
 export type PostForCreation = Pick<Post, BasePostInfo | "tags">;
-export type PostForUpdate   = Partial<Pick<Post, BasePostInfo | "isActive">>;
+export type PostForUpdate   = Partial<Pick<Post, BasePostInfo | "isActive" | "tags">>;
 
 export type PostOrderingOptions = {
     createdAt: SortOption,
