@@ -29,7 +29,7 @@ export class PrismaPostRepository implements PostRepository {
         throw new Error("Method not implemented.");
     }
 
-    async getById(id: number): Promise<Post | null> {
+    getById(id: number): Promise<Post | null> {
         throw new Error("Method not implemented.");
     }
 
