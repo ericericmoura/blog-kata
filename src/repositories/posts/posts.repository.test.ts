@@ -37,7 +37,17 @@ describe("Posts Repository", () => {
         }));
     })
 
-    test.todo("deletes a post");
+    test("deletes a post", async () => {
+        const {id} = await db.orm.public.Posts.create(getMockupPostForCreation(authorId) as Omit<PostForCreation, "tags">);
+
+        expect(id).toBeDefined();
+        
+        await postsRepository.delete(id);
+
+        const found = await db.orm.public.Posts.where({id}).first();
+        expect(found).toBeNull();
+    });
+
     test.todo("edits a post");
     test.todo("retrieves 10 most recent posts");
     test.todo("retrieves posts with a given tag");
