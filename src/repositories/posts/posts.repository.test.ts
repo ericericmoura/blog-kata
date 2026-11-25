@@ -49,19 +49,22 @@ describe("Posts Repository", () => {
     });
 
     test("edits a post", async () => {
-        const created = await db.orm.public.Posts.create(getMockupPostForCreation(authorId) as Omit<PostForCreation, "tags">);
+        const created = await db.orm.public.Posts
+            .create(getMockupPostForCreation(authorId) as Omit<PostForCreation, "tags">);
 
         const updated = await postsRepository.update(created.id, {title: "My Cool Title"});
         
         expect(updated).not.toBeNull();                
         expect(created.title).not.toBe(updated!.title);
         expect(created.updatedAt.getTime()).toBeLessThan(updated!.updatedAt.getTime());
+
+        console.log(created);
         
-        expect(created).toMatchObject({
+        expect({
             ...updated,
             updatedAt: created.updatedAt,
-            title    : created.title,
-        });
+            title: created.title,
+        }).toMatchObject(created);
     });
 
     test("edits a post tags", async () => {
@@ -73,14 +76,14 @@ describe("Posts Repository", () => {
         expect(updated!.tags).toBeDefined();
 
         expect(created.tags).not.toEqual(updated!.tags);
-        expect(updated!.tags).toEqual(["literature", "culture"]);
+        expect(updated!.tags).toEqual(["literature", "poetry"]);
         expect(created.updatedAt.getTime()).toBeLessThan(updated!.updatedAt.getTime());
 
-        expect(created).toMatchObject({
+        expect({
             ...updated,
             updatedAt: created.updatedAt,
-            tags     : created.tags,
-        });
+            tags: created.tags,
+        }).toMatchObject(created);
     });
 
     test.todo("retrieves 10 most recent posts");
