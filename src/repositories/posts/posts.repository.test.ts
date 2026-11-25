@@ -86,7 +86,27 @@ describe("Posts Repository", () => {
         }).toMatchObject(created);
     });
 
-    test.todo("retrieves 10 most recent posts");
+    test("retrieves 10 most recent posts", async () => {
+        const posts = await postsRepository.getMany({skip: 0, limit: 10, orderBy: {createdAt: "desc"}});
+
+        expect(posts.length).toBe(10);
+
+        let frameStart = 0;
+        let frameEnd   = 1;
+        for (let i = 0; i < posts.length - 1; i++) {
+            const current = posts.at(frameStart);
+            const next    = posts.at(frameEnd);
+            expect(current).toBeDefined();
+            expect(next   ).toBeDefined();
+
+            expect(current!.createdAt.getTime()).toBeGreaterThan(next!.createdAt.getTime());            
+
+            frameStart++;
+            frameEnd  ++;
+        }
+    });
+
+
     test.todo("retrieves posts with a given tag");
     test.todo("list all tags used by a post");
     test.todo("correctly paginates posts");
