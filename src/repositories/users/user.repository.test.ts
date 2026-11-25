@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, test } from "vitest";
+import { PrismaUserRepository } from "./user.repository";
+import { getMockupUserForCreation } from "@/mockups/user.mockup";
 
 describe("User Repository", () => {
     let userRepository: PrismaUserRepository;
