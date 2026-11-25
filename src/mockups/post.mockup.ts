@@ -1,4 +1,4 @@
-import type { Post, PostForCreation } from "@/repositories/posts.repository.interface.js";
+import type { Post, PostForCreation } from "@/repositories/posts/posts.repository.interface.js";
 import { faker } from "@faker-js/faker";
 
 export const AUTHOR_ID    : number = 1;

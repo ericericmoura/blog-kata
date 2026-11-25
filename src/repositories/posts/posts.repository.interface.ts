@@ -8,11 +8,12 @@ export interface Post {
     isActive : boolean,
     createdAt: Date,
     updatedAt: Date,
+    tags?    : string[],
 }
 
 type BasePostInfo = "title" | "body" | "authorId";
 
-export type PostForCreation = Pick<Post, BasePostInfo>;
+export type PostForCreation = Pick<Post, BasePostInfo | "tags">;
 export type PostForUpdate   = Partial<Pick<Post, BasePostInfo | "isActive">>;
 
 export type PostOrderingOptions = {
@@ -23,6 +24,7 @@ export type PostQueryOptions = {
     skip   ?: number,
     limit  ?: number,
     orderBy?: PostOrderingOptions,
+    tags   ?: string[],
 }
 
 export interface PostRepository {
