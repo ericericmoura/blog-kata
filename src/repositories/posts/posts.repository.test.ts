@@ -64,6 +64,25 @@ describe("Posts Repository", () => {
         });
     });
 
+    test("edits a post tags", async () => {
+        const { created } = await createPost(authorId, ["literature", "culture"]);
+
+        const updated = await postsRepository.update(created.id, { tags: ["literature", "poetry"] });
+
+        expect(updated).not.toBeNull();
+        expect(updated!.tags).toBeDefined();
+
+        expect(created.tags).not.toEqual(updated!.tags);
+        expect(updated!.tags).toEqual(["literature", "culture"]);
+        expect(created.updatedAt.getTime()).toBeLessThan(updated!.updatedAt.getTime());
+
+        expect(created).toMatchObject({
+            ...updated,
+            updatedAt: created.updatedAt,
+            tags     : created.tags,
+        });
+    });
+
     test.todo("retrieves 10 most recent posts");
     test.todo("retrieves posts with a given tag");
     test.todo("list all tags used by a post");
