@@ -48,7 +48,22 @@ describe("Posts Repository", () => {
         expect(found).toBeNull();
     });
 
-    test.todo("edits a post");
+    test("edits a post", async () => {
+        const created = await db.orm.public.Posts.create(getMockupPostForCreation(authorId) as Omit<PostForCreation, "tags">);
+
+        const updated = await postsRepository.update(created.id, {title: "My Cool Title"});
+        
+        expect(updated).not.toBeNull();                
+        expect(created.title).not.toBe(updated!.title);
+        expect(created.updatedAt.getTime()).toBeLessThan(updated!.updatedAt.getTime());
+        
+        expect(created).toMatchObject({
+            ...updated,
+            updatedAt: created.updatedAt,
+            title    : created.title,
+        });
+    });
+
     test.todo("retrieves 10 most recent posts");
     test.todo("retrieves posts with a given tag");
     test.todo("list all tags used by a post");
