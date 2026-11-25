@@ -86,7 +86,9 @@ describe("Posts Repository", () => {
         }).toMatchObject(created);
     });
 
-    test("retrieves 10 most recent posts", async () => {
+    test("retrieves 10 most recent posts", async () => {        
+        await createManyPosts(authorId, 10);
+
         const posts = await postsRepository.getMany({skip: 0, limit: 10, orderBy: {createdAt: "desc"}});
 
         expect(posts.length).toBe(10);
@@ -114,6 +116,12 @@ describe("Posts Repository", () => {
     const createPost = async (authorId: number, tags?: string[]): Promise<{ created: Post, input: PostForCreation }> => {
         const post = getMockupPostForCreation(authorId, tags);
         return {created: (await postsRepository.create(post)), input: post};
+    }
+
+    const createManyPosts = async (authorId: number, quantity: number, tags?: string[]): Promise<void> => {
+        for (let i = 0; i < quantity; i++) {
+            await createPost(authorId);
+        }
     }
 
     const getPost = async (id: number, includeTags: boolean): Promise<Post | null> => {
