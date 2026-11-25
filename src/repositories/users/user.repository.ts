@@ -2,8 +2,9 @@ import { db } from "@/prisma/db";
 import type { User, UserForCreation, UserRepository } from "./users.repository.interface";
 
 export class PrismaUserRepository implements UserRepository {
-    create(post: UserForCreation): Promise<User> {
-        throw new Error("Method not implemented.");
+    async create(user: UserForCreation): Promise<User> {
+        const created = await db.orm.public.Users.create(user);
+        return created;
     }
 
     async getById(id: number): Promise<User | null> {
