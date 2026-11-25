@@ -1,0 +1,255 @@
+[
+  {
+    "id": "dropColumn.Users.is_active",
+    "label": "Drop column \"is_active\" from \"Users\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "is_active",
+        "table": "Users"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"is_active\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "is_active"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"is_active\" on \"Users\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop column \"is_active\"",
+        "sql": "ALTER TABLE \"public\".\"Users\" DROP COLUMN \"is_active\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"is_active\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "is_active"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"is_active\" on \"Users\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "dropColumn.Users.password_hash",
+    "label": "Drop column \"password_hash\" from \"Users\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "password_hash",
+        "table": "Users"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"password_hash\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "password_hash"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"password_hash\" on \"Users\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop column \"password_hash\"",
+        "sql": "ALTER TABLE \"public\".\"Users\" DROP COLUMN \"password_hash\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"password_hash\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "password_hash"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"password_hash\" on \"Users\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "column.public.Users.isActive",
+    "label": "Add column \"isActive\" to \"Users\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "isActive",
+        "table": "Users"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"isActive\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "isActive"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"isActive\" on \"Users\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"isActive\"",
+        "sql": "ALTER TABLE \"public\".\"Users\" ADD COLUMN \"isActive\" bool DEFAULT true NOT NULL"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"isActive\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "isActive"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"isActive\" on \"Users\""
+        }
+      },
+      {
+        "description": "verify column \"isActive\" has type \"boolean\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "isActive",
+          "boolean"
+        ]
+      },
+      {
+        "description": "verify column \"isActive\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "isActive",
+          "NO"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "column.Users.passwordHash",
+    "label": "Add column passwordHash to Users",
+    "summary": "Adds column passwordHash to table Users",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Users"
+      }
+    },
+    "operationClass": "additive",
+    "precheck": [
+      {
+        "description": "ensure column \"passwordHash\" is missing",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "passwordHash"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"passwordHash\" on \"Users\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add column \"passwordHash\"",
+        "sql": "ALTER TABLE \"public\".\"Users\" ADD COLUMN \"passwordHash\" text DEFAULT ('') NOT NULL"
+      },
+      {
+        "description": "drop temporary default from column \"passwordHash\"",
+        "sql": "ALTER TABLE \"public\".\"Users\" ALTER COLUMN \"passwordHash\" DROP DEFAULT"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"passwordHash\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "passwordHash"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"passwordHash\" on \"Users\""
+        }
+      },
+      {
+        "description": "verify column \"passwordHash\" is NOT NULL",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"is_nullable\" = $4)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "passwordHash",
+          "NO"
+        ]
+      },
+      {
+        "description": "verify column \"passwordHash\" has no default after temporary default removal",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3 AND \"column_default\" IS NOT NULL)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "passwordHash"
+        ]
+      },
+      {
+        "description": "verify column \"passwordHash\" has type \"text\"",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_attribute\" AS \"a\" INNER JOIN \"pg_class\" AS \"c\" ON \"c\".\"oid\" = \"a\".\"attrelid\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"relnamespace\" WHERE (\"n\".\"nspname\" = $1 AND \"c\".\"relname\" = $2 AND \"a\".\"attname\" = $3 AND (format_type(\"a\".\"atttypid\", \"a\".\"atttypmod\")) = $4 AND NOT (\"a\".\"attisdropped\"))) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "passwordHash",
+          "text"
+        ]
+      }
+    ]
+  }
+]

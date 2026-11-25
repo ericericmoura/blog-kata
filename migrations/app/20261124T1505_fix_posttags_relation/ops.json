@@ -1,0 +1,200 @@
+[
+  {
+    "id": "dropConstraint.PostTags.PostTags_postId_tagId_key",
+    "label": "Drop constraint \"PostTags_postId_tagId_key\" on \"PostTags\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "PostTags_postId_tagId_key",
+        "table": "PostTags"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"PostTags_postId_tagId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "PostTags_postId_tagId_key",
+          "public",
+          "\"public\".\"PostTags\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "constraint \"PostTags_postId_tagId_key\" on \"PostTags\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop constraint \"PostTags_postId_tagId_key\"",
+        "sql": "ALTER TABLE \"public\".\"PostTags\" DROP CONSTRAINT \"PostTags_postId_tagId_key\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"PostTags_postId_tagId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "PostTags_postId_tagId_key",
+          "public",
+          "\"public\".\"PostTags\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"PostTags_postId_tagId_key\" on \"PostTags\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "dropConstraint.PostTags.PostTags_pkey",
+    "label": "Drop constraint \"PostTags_pkey\" on \"PostTags\"",
+    "operationClass": "widening",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "primaryKey",
+        "name": "PostTags_pkey",
+        "table": "PostTags"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"PostTags_pkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "PostTags_pkey",
+          "public",
+          "\"public\".\"PostTags\""
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "constraint \"PostTags_pkey\" on \"PostTags\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop constraint \"PostTags_pkey\"",
+        "sql": "ALTER TABLE \"public\".\"PostTags\" DROP CONSTRAINT \"PostTags_pkey\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"PostTags_pkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "PostTags_pkey",
+          "public",
+          "\"public\".\"PostTags\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "constraint \"PostTags_pkey\" on \"PostTags\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "dropColumn.PostTags.id",
+    "label": "Drop column \"id\" from \"PostTags\"",
+    "operationClass": "destructive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "id",
+        "table": "PostTags"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"id\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PostTags",
+          "id"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"id\" on \"PostTags\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "drop column \"id\"",
+        "sql": "ALTER TABLE \"public\".\"PostTags\" DROP COLUMN \"id\""
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify column \"id\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PostTags",
+          "id"
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "column \"id\" on \"PostTags\""
+        }
+      }
+    ]
+  },
+  {
+    "id": "primaryKey.PostTags.PostTags_pkey",
+    "label": "Add primary key on \"PostTags\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "primaryKey",
+        "name": "PostTags_pkey",
+        "table": "PostTags"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure primary key \"PostTags_pkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "PostTags_pkey",
+          "public",
+          "\"public\".\"PostTags\""
+        ],
+        "expectation": {
+          "expects": "absent",
+          "object": "primary key \"PostTags_pkey\" on \"PostTags\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "add primary key \"PostTags_pkey\"",
+        "sql": "ALTER TABLE \"public\".\"PostTags\" ADD CONSTRAINT \"PostTags_pkey\" PRIMARY KEY (\"postId\", \"tagId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify primary key \"PostTags_pkey\" exists on (postId, tagId)",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3) AND \"c\".\"contype\" = $4 AND (SELECT coalesce(jsonb_agg(key_attribute.attname ORDER BY key_column.position), '[]'::jsonb) FROM unnest(\"c\".\"conkey\"::int2[]) WITH ORDINALITY AS key_column(attnum, position) JOIN pg_attribute key_attribute ON key_attribute.attrelid = \"c\".\"conrelid\" AND key_attribute.attnum = key_column.attnum) = ($5)::jsonb)) AS \"result\"",
+        "params": [
+          "PostTags_pkey",
+          "public",
+          "\"public\".\"PostTags\"",
+          "p",
+          "[\"postId\",\"tagId\"]"
+        ]
+      }
+    ]
+  }
+]

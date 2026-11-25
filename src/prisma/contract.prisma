@@ -4,10 +4,10 @@ model Users {
   id            Int       @id @default(autoincrement())
   email         String    @unique
   username      String    @unique
-  password_hash String
-  is_active     Boolean   @default(true)
-  createdAt     DateTime  @onCreate(now())
-  updatedAt     DateTime  @onUpdate(now())
+  passwordHash  String
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now()) @onCreate(now())
+  updatedAt     temporal.UpdatedAt
   posts         Posts[]
 }
 
@@ -17,25 +17,26 @@ model Posts {
   body      String
   authorId  Int
   author    Users     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  createdAt DateTime  @onCreate(now())
-  updatedAt DateTime  @onUpdate(now())
+  createdAt DateTime  @default(now()) @onCreate(now())
+  updatedAt temporal.UpdatedAt
+  tags      Tags[]
 }
 
 model PostTags {
-  id        Int       @id @default(autoincrement())
   postId    Int
-  post      Posts     @relation(fields: [postId]  , references: [id], onDelete: Cascade)
-  authorId  Int
-  author    Users     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  createdAt DateTime  @onCreate(now())
-  updatedAt DateTime  @onUpdate(now())
+  post      Posts     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tagId     Int
+  tag       Tags      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @onCreate(now())
+  updatedAt temporal.UpdatedAt
 
-  @@unique([postId, authorId])
+  @@id([postId, tagId])
 }
 
 model Tags {
   id        Int       @id @default(autoincrement())
   tag       String    @unique
-  createdAt DateTime  @onCreate(now())
-  updatedAt DateTime  @onUpdate(now())
+  createdAt DateTime  @default(now()) @onCreate(now())
+  updatedAt temporal.UpdatedAt
+  posts     Posts[]
 }

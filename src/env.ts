@@ -6,7 +6,7 @@ dotenv.config();
 const envSchema = z.object({
     TEST_DATABASE_URL: z.url(),
     DATABASE_URL     : z.url(),
-    TESTING          : z.boolean().default(false),
+    TESTING          : z.coerce.boolean().default(false),
 })
 
 const result = envSchema.safeParse(process.env);

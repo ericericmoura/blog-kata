@@ -1,0 +1,146 @@
+[
+  {
+    "id": "setDefault.PostTags.createdAt",
+    "label": "Set default on \"PostTags\".\"createdAt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "createdAt",
+        "table": "PostTags"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"createdAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "PostTags",
+          "createdAt"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"createdAt\" on \"PostTags\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "set default on \"createdAt\"",
+        "sql": "ALTER TABLE \"public\".\"PostTags\" ALTER COLUMN \"createdAt\" SET DEFAULT (now())"
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "setDefault.Posts.createdAt",
+    "label": "Set default on \"Posts\".\"createdAt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "createdAt",
+        "table": "Posts"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"createdAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Posts",
+          "createdAt"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"createdAt\" on \"Posts\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "set default on \"createdAt\"",
+        "sql": "ALTER TABLE \"public\".\"Posts\" ALTER COLUMN \"createdAt\" SET DEFAULT (now())"
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "setDefault.Tags.createdAt",
+    "label": "Set default on \"Tags\".\"createdAt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "createdAt",
+        "table": "Tags"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"createdAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Tags",
+          "createdAt"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"createdAt\" on \"Tags\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "set default on \"createdAt\"",
+        "sql": "ALTER TABLE \"public\".\"Tags\" ALTER COLUMN \"createdAt\" SET DEFAULT (now())"
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "setDefault.Users.createdAt",
+    "label": "Set default on \"Users\".\"createdAt\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "column",
+        "name": "createdAt",
+        "table": "Users"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure column \"createdAt\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"information_schema\".\"columns\" WHERE (\"table_schema\" = $1 AND \"table_name\" = $2 AND \"column_name\" = $3)) AS \"result\"",
+        "params": [
+          "public",
+          "Users",
+          "createdAt"
+        ],
+        "expectation": {
+          "expects": "present",
+          "object": "column \"createdAt\" on \"Users\""
+        }
+      }
+    ],
+    "execute": [
+      {
+        "description": "set default on \"createdAt\"",
+        "sql": "ALTER TABLE \"public\".\"Users\" ALTER COLUMN \"createdAt\" SET DEFAULT (now())"
+      }
+    ],
+    "postcheck": []
+  }
+]

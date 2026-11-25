@@ -27,13 +27,6 @@
         "models": {
           "PostTags": {
             "fields": {
-              "authorId": {
-                "nullable": false,
-                "type": {
-                  "codecId": "pg/int4@1",
-                  "kind": "scalar"
-                }
-              },
               "createdAt": {
                 "nullable": false,
                 "type": {
@@ -44,14 +37,14 @@
                   }
                 }
               },
-              "id": {
+              "postId": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
                   "kind": "scalar"
                 }
               },
-              "postId": {
+              "tagId": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/int4@1",
@@ -70,22 +63,6 @@
               }
             },
             "relations": {
-              "author": {
-                "cardinality": "N:1",
-                "nullable": false,
-                "on": {
-                  "localFields": [
-                    "authorId"
-                  ],
-                  "targetFields": [
-                    "id"
-                  ]
-                },
-                "to": {
-                  "model": "Users",
-                  "namespace": "public"
-                }
-              },
               "post": {
                 "cardinality": "N:1",
                 "nullable": false,
@@ -101,21 +78,34 @@
                   "model": "Posts",
                   "namespace": "public"
                 }
+              },
+              "tag": {
+                "cardinality": "N:1",
+                "nullable": false,
+                "on": {
+                  "localFields": [
+                    "tagId"
+                  ],
+                  "targetFields": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Tags",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
               "fields": {
-                "authorId": {
-                  "column": "authorId"
-                },
                 "createdAt": {
                   "column": "createdAt"
                 },
-                "id": {
-                  "column": "id"
-                },
                 "postId": {
                   "column": "postId"
+                },
+                "tagId": {
+                  "column": "tagId"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -192,6 +182,34 @@
                   "model": "Users",
                   "namespace": "public"
                 }
+              },
+              "tags": {
+                "cardinality": "N:M",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "postId"
+                  ]
+                },
+                "through": {
+                  "childColumns": [
+                    "tagId"
+                  ],
+                  "namespaceId": "public",
+                  "parentColumns": [
+                    "postId"
+                  ],
+                  "table": "PostTags",
+                  "targetColumns": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Tags",
+                  "namespace": "public"
+                }
               }
             },
             "storage": {
@@ -256,7 +274,36 @@
                 }
               }
             },
-            "relations": {},
+            "relations": {
+              "posts": {
+                "cardinality": "N:M",
+                "on": {
+                  "localFields": [
+                    "id"
+                  ],
+                  "targetFields": [
+                    "tagId"
+                  ]
+                },
+                "through": {
+                  "childColumns": [
+                    "postId"
+                  ],
+                  "namespaceId": "public",
+                  "parentColumns": [
+                    "tagId"
+                  ],
+                  "table": "PostTags",
+                  "targetColumns": [
+                    "id"
+                  ]
+                },
+                "to": {
+                  "model": "Posts",
+                  "namespace": "public"
+                }
+              }
+            },
             "storage": {
               "fields": {
                 "createdAt": {
@@ -302,14 +349,14 @@
                   "kind": "scalar"
                 }
               },
-              "is_active": {
+              "isActive": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/bool@1",
                   "kind": "scalar"
                 }
               },
-              "password_hash": {
+              "passwordHash": {
                 "nullable": false,
                 "type": {
                   "codecId": "pg/text@1",
@@ -362,11 +409,11 @@
                 "id": {
                   "column": "id"
                 },
-                "is_active": {
-                  "column": "is_active"
+                "isActive": {
+                  "column": "isActive"
                 },
-                "password_hash": {
-                  "column": "password_hash"
+                "passwordHash": {
+                  "column": "passwordHash"
                 },
                 "updatedAt": {
                   "column": "updatedAt"
@@ -390,29 +437,24 @@
           "table": {
             "PostTags": {
               "columns": {
-                "authorId": {
-                  "codecId": "pg/int4@1",
-                  "dataType": "pg/int4",
-                  "nullable": false
-                },
                 "createdAt": {
                   "codecId": "pg/timestamptz-date@1",
                   "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
                   "nullable": false,
                   "typeParams": {
                     "precision": 3
                   }
                 },
-                "id": {
+                "postId": {
                   "codecId": "pg/int4@1",
                   "dataType": "pg/int4",
-                  "default": {
-                    "expression": "autoincrement()",
-                    "kind": "function"
-                  },
                   "nullable": false
                 },
-                "postId": {
+                "tagId": {
                   "codecId": "pg/int4@1",
                   "dataType": "pg/int4",
                   "nullable": false
@@ -449,12 +491,12 @@
                 },
                 {
                   "index": {
-                    "name": "PostTags_authorId_idx_e47547ed"
+                    "name": "PostTags_tagId_idx_86854244"
                   },
                   "onDelete": "cascade",
                   "source": {
                     "columns": [
-                      "authorId"
+                      "tagId"
                     ],
                     "namespaceId": "public",
                     "tableName": "PostTags"
@@ -464,19 +506,11 @@
                       "id"
                     ],
                     "namespaceId": "public",
-                    "tableName": "Users"
+                    "tableName": "Tags"
                   }
                 }
               ],
               "indexes": [
-                {
-                  "columns": [
-                    "authorId"
-                  ],
-                  "name": "PostTags_authorId_idx_e47547ed",
-                  "prefix": "PostTags_authorId_idx",
-                  "unique": false
-                },
                 {
                   "columns": [
                     "postId"
@@ -484,21 +518,23 @@
                   "name": "PostTags_postId_idx_a7a72715",
                   "prefix": "PostTags_postId_idx",
                   "unique": false
+                },
+                {
+                  "columns": [
+                    "tagId"
+                  ],
+                  "name": "PostTags_tagId_idx_86854244",
+                  "prefix": "PostTags_tagId_idx",
+                  "unique": false
                 }
               ],
               "primaryKey": {
                 "columns": [
-                  "id"
+                  "postId",
+                  "tagId"
                 ]
               },
-              "uniques": [
-                {
-                  "columns": [
-                    "postId",
-                    "authorId"
-                  ]
-                }
-              ]
+              "uniques": []
             },
             "Posts": {
               "columns": {
@@ -515,6 +551,10 @@
                 "createdAt": {
                   "codecId": "pg/timestamptz-date@1",
                   "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
                   "nullable": false,
                   "typeParams": {
                     "precision": 3
@@ -587,6 +627,10 @@
                 "createdAt": {
                   "codecId": "pg/timestamptz-date@1",
                   "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
                   "nullable": false,
                   "typeParams": {
                     "precision": 3
@@ -635,6 +679,10 @@
                 "createdAt": {
                   "codecId": "pg/timestamptz-date@1",
                   "dataType": "pg/timestamptz",
+                  "default": {
+                    "expression": "now()",
+                    "kind": "function"
+                  },
                   "nullable": false,
                   "typeParams": {
                     "precision": 3
@@ -654,7 +702,7 @@
                   },
                   "nullable": false
                 },
-                "is_active": {
+                "isActive": {
                   "codecId": "pg/bool@1",
                   "dataType": "pg/bool",
                   "default": {
@@ -663,7 +711,7 @@
                   },
                   "nullable": false
                 },
-                "password_hash": {
+                "passwordHash": {
                   "codecId": "pg/text@1",
                   "dataType": "pg/text",
                   "nullable": false
@@ -708,10 +756,10 @@
         "kind": "postgres-schema"
       }
     },
-    "storageHash": "038b6f66e8591bf2486ed83e1d766180a5258ab5d9162c9e7bee2769af4f09a8"
+    "storageHash": "62597d5e76d2564dd700930a23ac0ba8c921d4735d2e4f242793383c0633ed7d"
   },
   "execution": {
-    "executionHash": "9ad523257d6953fe83c57476b12413ea7d23661f39b39d963505b91a5c18686b",
+    "executionHash": "c52b465333827f1d9a8100c19215a4acca3e742d31d7835b7177c7accc051607",
     "mutations": {
       "defaults": [
         {
@@ -729,6 +777,13 @@
           }
         },
         {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
           "onUpdate": {
             "id": "timestampNow",
             "kind": "generator",
@@ -757,6 +812,13 @@
           }
         },
         {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
           "onUpdate": {
             "id": "timestampNow",
             "kind": "generator",
@@ -785,6 +847,13 @@
           }
         },
         {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
           "onUpdate": {
             "id": "timestampNow",
             "kind": "generator",
@@ -813,6 +882,13 @@
           }
         },
         {
+          "onCreate": {
+            "id": "timestampNow",
+            "kind": "generator",
+            "params": {
+              "precision": 3
+            }
+          },
           "onUpdate": {
             "id": "timestampNow",
             "kind": "generator",
