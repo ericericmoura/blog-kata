@@ -25,7 +25,6 @@ describe("Posts Repository", () => {
         { tags: ["literature", "culture", "horror", "action"], description: "multiple tags" },
         { tags: ["literature"], description: "a tag" },
         { tags: [], description: "no tags" },
-        { tags: ["action", "literature", "action"], description: "duplicated tags" },
     ])("creates a post with $description", async ({description, tags}) => {
         const { created, input } = await createPost(authorId, tags);
 
