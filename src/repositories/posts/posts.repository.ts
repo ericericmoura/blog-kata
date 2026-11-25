@@ -45,7 +45,10 @@ export class PrismaPostRepository implements PostRepository {
             const hasTags    = tagsObject.length > 0;
 
             if (hasTags) {
-                await db.orm.public.PostTags.where({ postId: id }).deleteAll();
+                await db.orm.public.PostTags
+                    .where({ postId: id })
+                    .where(pt => pt.tag.some(t => t.tag.notIn(postUpdate.tags!)))
+                    .deleteAll();
                 
                 await tx.orm.public.Tags.createAndCount(tagsObject,
                     {
