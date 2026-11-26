@@ -5,6 +5,7 @@ import { PrismaUserRepository } from "../users/user.repository.js";
 import { getMockupUserForCreation } from "@/mockups/user.mockup.js";
 import { db } from "@/prisma/db.js";
 import type { Post, PostForCreation } from "./posts.repository.interface.js";
+import { parseTags, serializeTags } from "@/utils/tags.utils.js";
 
 describe("Posts Repository", () => {
     let postsRepository = new PrismaPostRepository();
@@ -33,7 +34,7 @@ describe("Posts Repository", () => {
 
         expect(saved).toMatchObject(expect.objectContaining({
             ...input,
-            tags: input.tags?.map(t => ({ tag: t })) ?? []
+            tags: input.tags
         }));
     })
 
@@ -70,13 +71,13 @@ describe("Posts Repository", () => {
     test("edits a post tags", async () => {
         const { created } = await createPost(authorId, ["literature", "culture"]);
 
-        const updated = await postsRepository.update(created.id, { tags: ["literature", "poetry"] });
+        const updated = await postsRepository.update(created.id, { tags: serializeTags(["literature", "poetry"]) });
 
         expect(updated).not.toBeNull();
         expect(updated!.tags).toBeDefined();
 
         expect(created.tags).not.toEqual(updated!.tags);
-        expect(updated!.tags).toEqual(["literature", "poetry"]);
+        expect(updated!.tags).toEqual(serializeTags(["literature", "poetry"]));
         expect(created.updatedAt.getTime()).toBeLessThan(updated!.updatedAt.getTime());
 
         expect({
@@ -119,7 +120,7 @@ describe("Posts Repository", () => {
         const sportPosts = await postsRepository.getMany({tags: ["sport"], include: { tags: true }});
         expect(sportPosts.length).toBe(4);
         expect(sportPosts.at(0)!.tags).toBeDefined();
-        expect(sportPosts.every(p => p.tags!.some(t => t === "sport"))).toBe(true);
+        expect(sportPosts.every(p => parseTags(p.tags!).some(t => t === "sport"))).toBe(true);
 
         const literatureSportPosts = await postsRepository
             .getMany({ 
@@ -128,8 +129,10 @@ describe("Posts Repository", () => {
             });
         expect(literatureSportPosts.length).toBe(1); 
         expect(literatureSportPosts.at(0)!.tags).toBeDefined();
-        expect(literatureSportPosts.at(0)!.tags!.find(t => t === "sport"     )).toBeDefined();
-        expect(literatureSportPosts.at(0)!.tags!.find(t => t === "literature")).toBeDefined();
+
+        const parsedTags = parseTags(literatureSportPosts.at(0)!.tags!);
+        expect(parsedTags.find(t => t === "sport"     )).toBeDefined();
+        expect(parsedTags.find(t => t === "literature")).toBeDefined();
     });
 
     test.todo("list all tags used by a post");
