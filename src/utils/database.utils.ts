@@ -1,8 +1,10 @@
 import { db } from "@/prisma/db";
 
 export const clearDb = async (): Promise<void> => {
-    await db.orm.public.Users   .where({}).deleteAll();
-    await db.orm.public.Posts   .where({}).deleteAll();
-    await db.orm.public.Tags    .where({}).deleteAll();
-    await db.orm.public.PostTags.where({}).deleteAll();
+    const plan = db.raw.sql`
+        TRUNCATE "Users", "Posts", "Tags", "Comments", "PostTags"
+        RESTART IDENTITY CASCADE
+    `.affectedCount().build();
+
+    await db.execute(plan);
 }

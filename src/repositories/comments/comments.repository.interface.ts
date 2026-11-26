@@ -5,7 +5,7 @@ export interface Comment {
     updatedAt: Date,
 }
 
-export type CommentForCreation = Pick<Comment, "body"> & {postId: number};
+export type CommentForCreation = Pick<Comment, "body"> & {postId: number, userId: number};
 
 export type CommentsQueryOptions = {
     limit ?: number,
@@ -16,7 +16,7 @@ export type CommentsQueryOptions = {
 
 export interface CommentsRepository {
     getMany(options: CommentsQueryOptions): Promise<Comment[]>;    
-    createMany(input: {postId: number, comments: string[]}): Promise<Comment[]>;
+    createMany(input: { userId: number, postId: number, comments: string[] }): Promise<Comment[]>;
     create (comment: CommentForCreation): Promise<Comment>;
     delete (id: number): Promise<void>;
 }
