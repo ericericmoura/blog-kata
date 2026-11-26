@@ -60,7 +60,7 @@ export class PrismaPostRepository implements PostRepository {
 
             if (hasTags) {
                 if (isUpdating) {
-                    await db.orm.public.PostTags
+                    await tx.orm.public.PostTags
                         .where({ postId: id })
                         .where(pt => pt.tag.some(t => t.tag.notIn(parseTags(input.tags!))))
                         .deleteAll();
