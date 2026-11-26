@@ -22,9 +22,10 @@ describe("Tags Repository", () => {
     })
 
     test("lists all tags used by a post", async () => {        
-        const created = await postsRepository.create(getMockupPostForCreation(authorId, ["literature, culture"]));
+        const created = await postsRepository.create(getMockupPostForCreation(authorId, ["literature", "culture"]));
 
         const tags = await tagsRepository.getMany({ postId: created.id });
+
         expect(tags).not.toBeNull();
         expect(parseTags(tags)).toEqual(["literature", "culture"]);
     });
