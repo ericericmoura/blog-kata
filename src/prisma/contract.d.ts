@@ -18,9 +18,9 @@ import type {
 } from '@prisma/orm-postgres/contract-types';
 
 export type StorageHash =
-  StorageHashBase<'09d563962b21e6562f75779ba87403e4bf2755ee6e35ab6b85e297644ec9f3e5'>;
+  StorageHashBase<'6f68179e126e9eb557cc46bdb6ad966ded75aadcbe6dc96877b3aef6ec0d10d5'>;
 export type ExecutionHash =
-  ExecutionHashBase<'c52b465333827f1d9a8100c19215a4acca3e742d31d7835b7177c7accc051607'>;
+  ExecutionHashBase<'b41abb764f29ca59b40d1938e1944a3ff71db1e41df07ff10feaafcc4cfe9bdb'>;
 export type ProfileHash =
   ProfileHashBase<'3916f444a8a17ad749191acf9e08dad97d1a327b88c2f1d45d12f240296aa8b2'>;
 
@@ -304,6 +304,17 @@ export type StorageColumnInputTypes = ColumnTypesFromStorage<
 >;
 
 export namespace Models {
+  export type public_Comments = {
+    body: FieldOutputTypes['public']['Comments']['body'];
+    createdAt: FieldOutputTypes['public']['Comments']['createdAt'];
+    id: FieldOutputTypes['public']['Comments']['id'];
+    postId: FieldOutputTypes['public']['Comments']['postId'];
+    updatedAt: FieldOutputTypes['public']['Comments']['updatedAt'];
+    userId: FieldOutputTypes['public']['Comments']['userId'];
+    post: public_Posts;
+    user: public_Users;
+    readonly [RelationKeys]?: 'post' | 'user';
+  };
   export type public_PostTags = {
     createdAt: FieldOutputTypes['public']['PostTags']['createdAt'];
     postId: FieldOutputTypes['public']['PostTags']['postId'];
@@ -322,8 +333,9 @@ export namespace Models {
     title: FieldOutputTypes['public']['Posts']['title'];
     updatedAt: FieldOutputTypes['public']['Posts']['updatedAt'];
     author: public_Users;
+    comments: public_Comments[];
     tags: public_Tags[];
-    readonly [RelationKeys]?: 'author' | 'tags';
+    readonly [RelationKeys]?: 'author' | 'comments' | 'tags';
   };
   export type public_Tags = {
     createdAt: FieldOutputTypes['public']['Tags']['createdAt'];
@@ -341,13 +353,15 @@ export namespace Models {
     passwordHash: FieldOutputTypes['public']['Users']['passwordHash'];
     updatedAt: FieldOutputTypes['public']['Users']['updatedAt'];
     username: FieldOutputTypes['public']['Users']['username'];
+    comments: public_Comments[];
     posts: public_Posts[];
-    readonly [RelationKeys]?: 'posts';
+    readonly [RelationKeys]?: 'comments' | 'posts';
   };
 }
 
 export declare const models: {
   public: {
+    Comments: Models.public_Comments;
     PostTags: Models.public_PostTags;
     Posts: Models.public_Posts;
     Tags: Models.public_Tags;
@@ -373,6 +387,95 @@ type ContractBase = Omit<
         readonly kind: 'postgres-schema';
         readonly entries: {
           readonly table: {
+            readonly Comments: {
+              columns: {
+                readonly body: {
+                  readonly dataType: 'pg/text';
+                  readonly codecId: 'pg/text@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly createdAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly default: { readonly kind: 'function'; readonly expression: 'now()' };
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly id: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly default: {
+                    readonly kind: 'function';
+                    readonly expression: 'autoincrement()';
+                  };
+                  readonly many: false;
+                };
+                readonly postId: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+                readonly updatedAt: {
+                  readonly dataType: 'pg/timestamptz';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly nullable: false;
+                  readonly typeParams: { readonly precision: 3 };
+                  readonly many: false;
+                };
+                readonly userId: {
+                  readonly dataType: 'pg/int4';
+                  readonly codecId: 'pg/int4@1';
+                  readonly nullable: false;
+                  readonly many: false;
+                };
+              };
+              primaryKey: { readonly columns: readonly ['id'] };
+              uniques: readonly [];
+              indexes: readonly [
+                {
+                  readonly name: 'Comments_postId_idx_a7a72715';
+                  readonly prefix: 'Comments_postId_idx';
+                  readonly columns: readonly ['postId'];
+                  readonly unique: false;
+                },
+                {
+                  readonly name: 'Comments_userId_idx_a489d58a';
+                  readonly prefix: 'Comments_userId_idx';
+                  readonly columns: readonly ['userId'];
+                  readonly unique: false;
+                },
+              ];
+              foreignKeys: readonly [
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Comments';
+                    readonly columns: readonly ['postId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Posts';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+                {
+                  readonly source: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Comments';
+                    readonly columns: readonly ['userId'];
+                  };
+                  readonly target: {
+                    readonly namespaceId: 'public' & NamespaceId;
+                    readonly tableName: 'Users';
+                    readonly columns: readonly ['id'];
+                  };
+                },
+              ];
+            };
             readonly PostTags: {
               columns: {
                 readonly createdAt: {
@@ -641,6 +744,7 @@ type ContractBase = Omit<
   readonly target: 'postgres';
   readonly targetFamily: 'sql';
   readonly roots: {
+    readonly Comments: { readonly namespace: 'public' & NamespaceId; readonly model: 'Comments' };
     readonly PostTags: { readonly namespace: 'public' & NamespaceId; readonly model: 'PostTags' };
     readonly Posts: { readonly namespace: 'public' & NamespaceId; readonly model: 'Posts' };
     readonly Tags: { readonly namespace: 'public' & NamespaceId; readonly model: 'Tags' };
@@ -650,6 +754,80 @@ type ContractBase = Omit<
     readonly namespaces: {
       readonly public: {
         readonly models: {
+          readonly Comments: {
+            readonly fields: {
+              readonly body: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/text@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly postId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+              readonly updatedAt: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'scalar';
+                  readonly codecId: 'pg/timestamptz-date@1';
+                  readonly typeParams: { readonly precision: 3 };
+                };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'pg/int4@1' };
+              };
+            };
+            readonly relations: {
+              readonly post: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Posts';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['postId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly user: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Users';
+                };
+                readonly cardinality: 'N:1';
+                readonly nullable: false;
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['id'];
+                };
+              };
+            };
+            readonly storage: {
+              readonly table: 'Comments';
+              readonly namespaceId: 'public';
+              readonly fields: {
+                readonly body: { readonly column: 'body' };
+                readonly createdAt: { readonly column: 'createdAt' };
+                readonly id: { readonly column: 'id' };
+                readonly postId: { readonly column: 'postId' };
+                readonly updatedAt: { readonly column: 'updatedAt' };
+                readonly userId: { readonly column: 'userId' };
+              };
+            };
+          };
           readonly PostTags: {
             readonly fields: {
               readonly createdAt: {
@@ -761,6 +939,17 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['authorId'];
                   readonly targetFields: readonly ['id'];
+                };
+              };
+              readonly comments: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Comments';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['postId'];
                 };
               };
               readonly tags: {
@@ -891,6 +1080,17 @@ type ContractBase = Omit<
               };
             };
             readonly relations: {
+              readonly comments: {
+                readonly to: {
+                  readonly namespace: 'public' & NamespaceId;
+                  readonly model: 'Comments';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
               readonly posts: {
                 readonly to: {
                   readonly namespace: 'public' & NamespaceId;
@@ -957,6 +1157,35 @@ type ContractBase = Omit<
     readonly executionHash: ExecutionHash;
     readonly mutations: {
       readonly defaults: readonly [
+        {
+          readonly onCreate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly ref: {
+            readonly entry: 'Comments';
+            readonly field: 'createdAt';
+            readonly namespace: 'public';
+          };
+        },
+        {
+          readonly onCreate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly onUpdate: {
+            readonly id: 'timestampNow';
+            readonly kind: 'generator';
+            readonly params: { readonly precision: 3 };
+          };
+          readonly ref: {
+            readonly entry: 'Comments';
+            readonly field: 'updatedAt';
+            readonly namespace: 'public';
+          };
+        },
         {
           readonly onCreate: {
             readonly id: 'timestampNow';

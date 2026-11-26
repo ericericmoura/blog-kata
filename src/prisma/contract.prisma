@@ -9,6 +9,7 @@ model Users {
   createdAt     DateTime  @default(now()) @onCreate(now())
   updatedAt     temporal.UpdatedAt
   posts         Posts[]
+  comments      Comments[]
 }
 
 model Posts {
@@ -21,6 +22,7 @@ model Posts {
   createdAt DateTime  @default(now()) @onCreate(now())
   updatedAt temporal.UpdatedAt
   tags      Tags[]
+  comments  Comments[]
 }
 
 model PostTags {
@@ -40,4 +42,15 @@ model Tags {
   createdAt DateTime  @default(now()) @onCreate(now())
   updatedAt temporal.UpdatedAt
   posts     Posts[]
+}
+
+model Comments {
+  id        Int       @id @default(autoincrement())
+  body      String    
+  postId    Int
+  post      Posts     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    Int
+  user      Users     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now()) @onCreate(now())
+  updatedAt temporal.UpdatedAt
 }

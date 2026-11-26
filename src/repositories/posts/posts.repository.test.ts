@@ -133,8 +133,6 @@ describe("Posts Repository", () => {
         expect(parsedTags.find(t => t === "literature")).toBeDefined();
     });
     
-    test.todo("correctly paginates posts");
-
     const createPost = async (authorId: number, tags?: string[]): Promise<{ created: Post, input: PostForCreation }> => {
         const post = getMockupPostForCreation(authorId, tags);
         return {created: (await postsRepository.create(post)), input: post};
