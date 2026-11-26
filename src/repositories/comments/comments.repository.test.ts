@@ -10,7 +10,6 @@ import { db } from "@/prisma/db";
 
 describe("Comments Repository", () => {
     const commentsRepository = new PrismaCommentsRepository();
-    const postsRepository    = new PrismaPostRepository();
     const usersRepository    = new PrismaUserRepository();
 
     let authorId: number;
@@ -24,14 +23,14 @@ describe("Comments Repository", () => {
     test("creates a comment for a post", async () => {
         const { id: postId } = await createMockupPost();
 
-        await commentsRepository.create({ postId, body: "Meu comentário legal"});
+        await commentsRepository.create({ postId, userId: authorId, body: "Meu comentário legal"});
     });
 
     test("creates many comments for a post", async () => {
         const { id: postId } = await createMockupPost();
 
         const comments = ["Comentário 1", "Comentário 2", "That's really cool!"];
-        await commentsRepository.createMany({ postId, comments });
+        await commentsRepository.createMany({ userId: authorId, postId, comments });
 
         const saved = await db.orm.public.Comments.where({postId}).select("body").all();
 

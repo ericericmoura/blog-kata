@@ -9,5 +9,6 @@ export default defineConfig({
     },
     test: {
         env: { TESTING: 'true' },
+        fileParallelism: false,
     },
 })
