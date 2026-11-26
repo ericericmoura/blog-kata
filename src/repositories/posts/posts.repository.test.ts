@@ -108,8 +108,30 @@ describe("Posts Repository", () => {
         }
     });
 
+    test("retrieves posts with a given tag", async () => {
+        await createManyPostsWithTags(
+            authorId, [
+                { qnt: 3, tags: ["sport" ] }, 
+                { qnt: 6, tags: ["health"] }, 
+                { qnt: 1, tags: ["literature", "sport"] }
+            ]);
 
-    test.todo("retrieves posts with a given tag");
+        const sportPosts = await postsRepository.getMany({tags: ["sport"], include: { tags: true }});
+        expect(sportPosts.length).toBe(4);
+        expect(sportPosts.at(0)!.tags).toBeDefined();
+        expect(sportPosts.every(p => p.tags!.some(t => t === "sport"))).toBe(true);
+
+        const literatureSportPosts = await postsRepository
+            .getMany({ 
+                tags: ["sport", "literature"], 
+                include: { tags: true },
+            });
+        expect(literatureSportPosts.length).toBe(1); 
+        expect(literatureSportPosts.at(0)!.tags).toBeDefined();
+        expect(literatureSportPosts.at(0)!.tags!.find(t => t === "sport"     )).toBeDefined();
+        expect(literatureSportPosts.at(0)!.tags!.find(t => t === "literature")).toBeDefined();
+    });
+
     test.todo("list all tags used by a post");
     test.todo("correctly paginates posts");
 
@@ -120,7 +142,13 @@ describe("Posts Repository", () => {
 
     const createManyPosts = async (authorId: number, quantity: number, tags?: string[]): Promise<void> => {
         for (let i = 0; i < quantity; i++) {
-            await createPost(authorId);
+            await createPost(authorId, tags);
+        }
+    }
+
+    const createManyPostsWithTags = async (authorId: number, posts: {qnt: number, tags: string[]}[]): Promise<void> => {
+        for (const post of posts) {
+            await createManyPosts(authorId, post.qnt, post.tags);
         }
     }
 
