@@ -6,18 +6,16 @@ import { getMockupUserForCreation } from "@/mockups/user.mockup.js";
 import { db } from "@/prisma/db.js";
 import type { Post, PostForCreation } from "./posts.repository.interface.js";
 import { parseTags, serializeTags } from "@/utils/tags.utils.js";
+import { clearDb } from "@/utils/database.utils.js";
 
 describe("Posts Repository", () => {
     let postsRepository = new PrismaPostRepository();
-    let usersRepository = new PrismaUserRepository();
+    let usersRepository = new PrismaUserRepository();    
 
     let authorId: number;
 
     beforeEach(async () => {
-        await db.orm.public.Users   .where({}).deleteAll();
-        await db.orm.public.Posts   .where({}).deleteAll();
-        await db.orm.public.Tags    .where({}).deleteAll();
-        await db.orm.public.PostTags.where({}).deleteAll();
+        await clearDb();
 
         authorId = (await usersRepository.create(getMockupUserForCreation())).id;
     })
