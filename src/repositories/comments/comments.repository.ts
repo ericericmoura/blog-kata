@@ -4,7 +4,10 @@ export class PrismaCommentsRepository implements CommentsRepository {
     getMany(options: CommentsQueryOptions): Promise<Comment[]> {
         throw new Error("Method not implemented.");
     }
-    create(user: CommentForCreation): Promise<Comment> {
+    createMany(input: { postId: number; comments: string[]; }): Promise<Comment[]> {
+        throw new Error("Method not implemented.");
+    }
+    create(comment: CommentForCreation): Promise<Comment> {
         throw new Error("Method not implemented.");
     }
     delete(id: number): Promise<void> {
