@@ -1,6 +1,6 @@
 import type { Tag } from "@/repositories/posts/posts.repository.interface";
 
-export const parseTags = (tags: Tag[] | undefined): string[] => {
+export const parseTags = (tags: Tag[] | undefined | null): string[] => {
     return (tags ?? []).map((t) => t.tag);
 }
 

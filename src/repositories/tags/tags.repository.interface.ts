@@ -12,5 +12,5 @@ export type TagQueryOptions = {
 }
 
 export interface TagsRepository {
-    getMany(options: TagQueryOptions): Promise<Tag | null>;
+    getMany(options: TagQueryOptions): Promise<Tag[] | null>;
 }
