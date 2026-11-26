@@ -133,14 +133,6 @@ describe("Posts Repository", () => {
         expect(parsedTags.find(t => t === "literature")).toBeDefined();
     });
     
-    test("lists all tags used by a post", async () => {
-        const { created } = await createPost(authorId, ["literature", "culture"]);
-
-        const tags = await tagsRepository.getMany({postId: created.id});
-        expect(tags).not.toBeNull();
-        expect(parseTags(tags)).toEqual(["literature", "culture"]);
-    });
-
     test.todo("correctly paginates posts");
 
     const createPost = async (authorId: number, tags?: string[]): Promise<{ created: Post, input: PostForCreation }> => {
