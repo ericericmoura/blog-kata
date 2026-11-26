@@ -11,6 +11,10 @@ export interface Post {
     tags?    : string[],
 }
 
+export interface Tag {
+    tag: string,
+}
+
 type BasePostInfo = "title" | "body" | "authorId";
 
 export type PostForCreation = Pick<Post, BasePostInfo | "tags">;
@@ -25,6 +29,7 @@ export type PostQueryOptions = {
     limit  ?: number,
     orderBy?: PostOrderingOptions,
     tags   ?: string[],
+    include?: {tags: boolean}
 }
 
 export interface PostRepository {
