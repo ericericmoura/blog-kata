@@ -8,7 +8,7 @@ export interface Post {
     isActive : boolean,
     createdAt: Date,
     updatedAt: Date,
-    tags?    : string[],
+    tags?    : Tag[],
 }
 
 export interface Tag {

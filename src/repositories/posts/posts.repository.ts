@@ -3,12 +3,12 @@ import type { Post, PostForCreation, PostForUpdate, PostQueryOptions, PostReposi
 import type { PostgresTransactionContext } from "@prisma/orm-postgres/runtime";
 import type { Contract } from "@/prisma/contract.js";
 import { and, type NoCollectionClasses } from "@prisma/orm-postgres/orm-client";
+import { parseTags } from "@/utils/tags.utils.js";
 
 export class PrismaPostRepository implements PostRepository {
     async create(post: PostForCreation): Promise<Post> {
-        const result = await db.transaction(async (tx) => {
-            const tagsObject = this.serializeTags(post.tags);
-            const hasTags = tagsObject.length > 0;
+        return await db.transaction(async (tx) => {            
+            const hasTags = post.tags !== undefined && post.tags.length > 0;
 
             if (hasTags) {
                 await this.createTagsForPost(post.tags!, tx);
@@ -18,18 +18,17 @@ export class PrismaPostRepository implements PostRepository {
                 title: post.title,
                 body: post.body,
                 authorId: post.authorId,
-                ...(hasTags && { tags: (t) => t.connect(tagsObject) }),
+                ...(hasTags && { tags: (t) => t.connect(post.tags!) }),
             })
 
             return newPost;
-        })
-        return result as Post;
+        });
     }
 
     async getMany(options: PostQueryOptions): Promise<Post[]> {
         const createdAtDesc = (options.orderBy?.createdAt ?? "desc") === "desc";
-        const filterByTag = options.tags && options.tags.length > 0;
-        const includeTags = options.include?.tags ?? false;
+        const filterByTag   = options.tags && options.tags.length > 0;
+        const includeTags   = options.include?.tags ?? false;
 
         let query = db.orm.public.Posts
             .where((p) => (
@@ -45,12 +44,7 @@ export class PrismaPostRepository implements PostRepository {
 
         if (!includeTags) return await query.all();
 
-        const posts = await query.include("tags", (t) => t.select("tag")).all()
-
-        return posts.map(({ tags, ...p }) => ({
-            ...p,
-            tags: tags.map(t => t.tag),
-        }));
+        return await query.include("tags", (t) => t.select("tag")).all();
     }
 
     getById(id: number): Promise<Post | null> {
@@ -62,14 +56,13 @@ export class PrismaPostRepository implements PostRepository {
     }
 
     async update(id: number, postUpdate: PostForUpdate): Promise<Post | null> {
-        return db.transaction(async (tx) => {
-            const tagsObject = this.serializeTags(postUpdate.tags);
-            const hasTags = tagsObject.length > 0;
+        return db.transaction(async (tx) => {            
+            const hasTags = postUpdate.tags !== undefined && postUpdate.tags.length > 0;
 
             if (hasTags) {
                 await db.orm.public.PostTags
                     .where({ postId: id })
-                    .where(pt => pt.tag.some(t => t.tag.notIn(postUpdate.tags!)))
+                    .where(pt => pt.tag.some(t => t.tag.notIn(parseTags(postUpdate.tags!))))
                     .deleteAll();
 
                 await this.createTagsForPost(postUpdate.tags!, tx);
@@ -77,34 +70,21 @@ export class PrismaPostRepository implements PostRepository {
 
             const updated = await tx.orm.public.Posts.where({ id }).include("tags", t => t.select("tag")).update({
                 ...postUpdate as Omit<PostForUpdate, "tags">,
-                ...(hasTags && { tags: (t) => t.connect(tagsObject) }),
+                ...(hasTags && { tags: (t) => t.connect(postUpdate.tags!) }),
                 updatedAt: new Date(),
             });
 
             if (updated === null) return null;
 
-            return {
-                ...updated,
-                tags: this.parseTags(updated.tags),
-            };
+            return updated;
         })
     }
 
-    async createTagsForPost(tags: string[], tx: PostgresTransactionContext<Contract, NoCollectionClasses>) {
-        const tagsObject = tags.map((tag) => ({ tag }));
-
-        await tx.orm.public.Tags.createAndCount(tagsObject,
+    async createTagsForPost(tags: Tag[], tx: PostgresTransactionContext<Contract, NoCollectionClasses>) {
+        await tx.orm.public.Tags.createAndCount(tags,
             {
                 onConflict: "skip",
                 conflictOn: ["tag"],
             });
-    }
-
-    serializeTags(tags: string[] | undefined): Tag[] {
-        return (tags ?? []).map((tag) => ({ tag }));
-    }
-
-    parseTags(tags: Tag[] | undefined): string[] {
-        return (tags ?? []).map((t) => t.tag);
-    }
+    }    
 }
