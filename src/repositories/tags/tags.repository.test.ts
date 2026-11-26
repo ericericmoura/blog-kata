@@ -6,6 +6,7 @@ import { getMockupUserForCreation } from "@/mockups/user.mockup";
 import { PrismaUserRepository } from "../users/user.repository";
 import { parseTags } from "@/utils/tags.utils";
 import { clearDb } from "@/utils/database.utils";
+import { PrismaTagsRepository } from "./tags.repository";
 
 describe("Tags Repository", () => {
     let tagsRepository  = new PrismaTagsRepository();
