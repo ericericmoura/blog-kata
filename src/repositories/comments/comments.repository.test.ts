@@ -20,4 +20,6 @@ describe("Comments Repository", () => {
     test.todo("comments on a post");
     test.todo("deletes all comments");
     test.todo("list 10 most recent comments from a post");
+    test.todo("list 10 most recent comments from a user");
+    test.todo("list 10 most recent comments from a user on a post");
 })
