@@ -2,12 +2,13 @@ import { beforeEach, describe, expect, test } from "vitest";
 import { PrismaUserRepository } from "./user.repository";
 import { getMockupUserForCreation } from "@/mockups/user.mockup";
 import { db } from "@/prisma/db";
+import { clearDb } from "@/utils/database.utils";
 
 describe("User Repository", () => {
     let userRepository = new PrismaUserRepository();
 
     beforeEach(async () => {
-        await db.orm.public.Users.where({}).deleteAll();
+        await clearDb();
     })
 
     test("creates an user", async () => {
