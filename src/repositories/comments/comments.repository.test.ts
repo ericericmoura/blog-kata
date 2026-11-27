@@ -24,6 +24,8 @@ describe("Comments Repository", () => {
         const { id: postId } = await createMockupPost();
 
         await commentsRepository.create({ postId, userId: authorId, body: "Meu comentário legal"});
+        const saved = await db.orm.public.Comments.where({ postId }).select("body").first();
+        expect(saved).not.toBeNull();
     });
 
     test("creates many comments for a post", async () => {
@@ -37,7 +39,17 @@ describe("Comments Repository", () => {
         expect(comments).toEqual(saved.map(c => c.body));
     });
 
-    test.todo("deletes all comments");
+    test("deletes a comment by id", async () => {
+        const { id: postId } = await createMockupPost();
+
+        const { id } = await commentsRepository.create({ postId, userId: authorId, body: "Meu comentário legal" });
+        expect(id).toBeDefined();
+        await commentsRepository.delete(id);        
+        
+        const saved = await db.orm.public.Comments.where({ postId }).select("body").first();
+        expect(saved).toBeNull();
+    });
+
     test.todo("list 10 most recent comments from a post");
     test.todo("list 10 most recent comments from a user");
     test.todo("list 10 most recent comments from a user on a post");    
