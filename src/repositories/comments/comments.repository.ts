@@ -20,7 +20,7 @@ export class PrismaCommentsRepository implements CommentsRepository {
         return await db.orm.public.Comments.create(comment);
     }
 
-    delete(id: number): Promise<void> {
-        throw new Error("Method not implemented.");
+    async delete(id: number): Promise<void> {
+        await db.orm.public.Comments.where({id}).delete();
     }
 }
