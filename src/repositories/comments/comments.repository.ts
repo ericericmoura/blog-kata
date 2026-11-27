@@ -10,9 +10,10 @@ export class PrismaCommentsRepository implements CommentsRepository {
                 c => c.createdAt.desc(),
                 c => c.id.desc(),
             ]);
-        if (options.postId) {
-            query = query.where({postId: options.postId});
-        }
+        
+        if (options.postId) query = query.where({ postId: options.postId });
+        if (options.userId) query = query.where({ userId: options.userId });
+
         return await query.all();
     }
 
