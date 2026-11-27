@@ -51,19 +51,48 @@ describe("Comments Repository", () => {
     });
 
     describe("comments listing", () => {
+        let postId: number;
+
         beforeEach(async () => {
-            const comments = ["Comentário 1", "Comentário 2", "That's really cool!"]
-            const { id: postId } = await createMockupPost();
+            const comments = [
+                "Can't wait for the open beta next month!",
+                "The gunplay in that trailer looks super crisp.",
+                "Finally, a tactical shooter without bloated hero abilities.",
+                "Will there be crossplay on day one?",
+                "Already wishlisted! Drop the system requirements soon.",
+                "Movement mechanics remind me of classic arena shooters.",
+                "Hope the anti-cheat is strong at launch.",
+                "Those weapon sound effects are next level.",
+                "Sign me up for the closed playtest!",
+                "Looks promising, just please avoid pay-to-win microtransactions."
+            ];
+            
+            postId = (await createMockupPost()).id;
 
             const input = comments.map(c => ({
                 userId: authorId,
-                postId: postId,
+                postId,
                 body: c
             }));            
             await db.orm.public.Comments.createAll(input);
         })
         
-        test.todo("list 10 most recent comments from a post");    
+        test("list 10 most recent comments for a post", async () => {
+            const comments = await commentsRepository.getMany({postId, limit: 10});
+
+            expect(comments).toBeDefined();
+            expect(comments.length).toBe(10);
+            for (let i = 0; i < comments.length - 1; i++) {
+                const frameStart = i;
+                const frameEnd   = i+1;
+                
+                const firstComment  = comments.at(frameStart)!;
+                const secondComment = comments.at(frameEnd  )!;
+
+                expect(firstComment.createdAt.getTime()).toBeGreaterThan(secondComment.createdAt.getTime());
+            }
+        });    
+
         test.todo("list 10 most recent comments from a user");
         test.todo("list 10 most recent comments from a user on a post");    
     });
