@@ -50,9 +50,24 @@ describe("Comments Repository", () => {
         expect(saved).toBeNull();
     });
 
-    test.todo("list 10 most recent comments from a post");
-    test.todo("list 10 most recent comments from a user");
-    test.todo("list 10 most recent comments from a user on a post");    
+    describe("comments listing", () => {
+        beforeEach(async () => {
+            const comments = ["Comentário 1", "Comentário 2", "That's really cool!"]
+            const { id: postId } = await createMockupPost();
+
+            const input = comments.map(c => ({
+                userId: authorId,
+                postId: postId,
+                body: c
+            }));            
+            await db.orm.public.Comments.createAll(input);
+        })
+        
+        test.todo("list 10 most recent comments from a post");    
+        test.todo("list 10 most recent comments from a user");
+        test.todo("list 10 most recent comments from a user on a post");    
+    });
+
 
     const createMockupPost = async (): Promise<Post> => {
         return await db.orm.public.Posts.create(getMockupPostForCreation(authorId) as Omit<PostForCreation, "tags">);
