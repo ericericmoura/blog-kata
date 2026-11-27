@@ -2,8 +2,18 @@ import { db } from "@/prisma/db";
 import type { Comment, CommentForCreation, CommentsQueryOptions, CommentsRepository } from "./comments.repository.interface";
 
 export class PrismaCommentsRepository implements CommentsRepository {
-    getMany(options: CommentsQueryOptions): Promise<Comment[]> {
-        throw new Error("Method not implemented.");
+    async getMany(options: CommentsQueryOptions): Promise<Comment[]> {
+        let query = db.orm.public.Comments
+            .limit (options.limit ?? 10)
+            .offset(options.skip  ?? 0 )
+            .orderBy([
+                c => c.createdAt.desc(),
+                c => c.id.desc(),
+            ]);
+        if (options.postId) {
+            query = query.where({postId: options.postId});
+        }
+        return await query.all();
     }
 
     async createMany(input: { userId: number, postId: number; comments: string[]; }): Promise<Comment[]> {
