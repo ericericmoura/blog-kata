@@ -26,7 +26,7 @@ describe("Tags Repository", () => {
 
         const tags = await tagsRepository.getMany({ postId: created.id });
 
-        expect(tags).not.toBeNull();
+        expect(tags.length).toBe(2);
         expect(parseTags(tags)).toEqual(["literature", "culture"]);
     });
 })

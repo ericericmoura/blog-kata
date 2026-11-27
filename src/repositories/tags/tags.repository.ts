@@ -2,7 +2,7 @@ import { db } from "@/prisma/db";
 import type { Tag, TagQueryOptions, TagsRepository } from "./tags.repository.interface";
 
 export class PrismaTagsRepository implements TagsRepository {
-    async getMany(options: TagQueryOptions): Promise<Tag[] | null> {
+    async getMany(options: TagQueryOptions): Promise<Tag[]> {
         let query = db.orm.public.Tags
             .offset(options.skip  ?? 0 )
             .limit (options.limit ?? 20);            
