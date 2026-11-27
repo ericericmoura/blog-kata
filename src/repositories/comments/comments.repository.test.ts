@@ -68,14 +68,16 @@ describe("Comments Repository", () => {
             ];
             
             postId = (await createMockupPost()).id;
+            
+            const secondUserId = (await usersRepository.create(getMockupUserForCreation())).id;
 
-            let i = 0;
+            let i = -1;
             const input = comments.map(c => {                
-                const createdAt = new Date(2020 + i, i);
                 i++;
+                const createdAt = new Date(2020 + i, i);
 
                 return {
-                    userId: authorId,
+                    userId: i < 5 ? secondUserId : authorId,
                     postId,
                     body: c,
                     createdAt,
@@ -100,7 +102,22 @@ describe("Comments Repository", () => {
             }
         });    
 
-        test.todo("list 10 most recent comments from a user");
+        test("list 5 most recent comments from a user", async () => {
+            const comments = await commentsRepository.getMany({ userId: authorId, limit: 5 });
+
+            expect(comments).toBeDefined();
+            expect(comments.length).toBe(5);
+            for (let i = 0; i < comments.length - 1; i++) {
+                const frameStart = i;
+                const frameEnd = i + 1;
+
+                const firstComment = comments.at(frameStart)!;
+                const secondComment = comments.at(frameEnd)!;
+
+                expect(firstComment.createdAt.getTime()).toBeGreaterThan(secondComment.createdAt.getTime());
+            }
+        });
+
         test.todo("list 10 most recent comments from a user on a post");    
     });
 
