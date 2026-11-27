@@ -69,11 +69,18 @@ describe("Comments Repository", () => {
             
             postId = (await createMockupPost()).id;
 
-            const input = comments.map(c => ({
-                userId: authorId,
-                postId,
-                body: c
-            }));            
+            let i = 0;
+            const input = comments.map(c => {                
+                const createdAt = new Date(2020 + i, i);
+                i++;
+
+                return {
+                    userId: authorId,
+                    postId,
+                    body: c,
+                    createdAt,
+                }
+            });            
             await db.orm.public.Comments.createAll(input);
         })
         
