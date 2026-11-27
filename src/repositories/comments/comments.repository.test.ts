@@ -53,6 +53,9 @@ describe("Comments Repository", () => {
     describe("comments listing", () => {
         let postId: number;
 
+        let secondPostId: number;
+        let secondUserId: number;
+
         beforeEach(async () => {
             const comments = [
                 "Can't wait for the open beta next month!",
@@ -64,12 +67,18 @@ describe("Comments Repository", () => {
                 "Hope the anti-cheat is strong at launch.",
                 "Those weapon sound effects are next level.",
                 "Sign me up for the closed playtest!",
-                "Looks promising, just please avoid pay-to-win microtransactions."
+                "Looks promising, just please avoid pay-to-win microtransactions.",
+                "Destructible environments look like a total game changer.",
+                "What is the target frame rate on consoles?",
+                "Love the gritty, grounded art direction here.",
+                "Please confirm dedicated servers for South America!",
+                "Pre-ordering as soon as the page goes live."
             ];
             
             postId = (await createMockupPost()).id;
             
-            const secondUserId = (await usersRepository.create(getMockupUserForCreation())).id;
+            secondPostId = (await createMockupPost()).id;
+            secondUserId = (await usersRepository.create(getMockupUserForCreation())).id;
 
             let i = -1;
             const input = comments.map(c => {                
@@ -77,8 +86,8 @@ describe("Comments Repository", () => {
                 const createdAt = new Date(2020 + i, i);
 
                 return {
-                    userId: i < 5 ? secondUserId : authorId,
-                    postId,
+                    userId: i % 2 === 0 ? secondUserId : authorId,
+                    postId: i < 10      ? postId       : secondPostId,
                     body: c,
                     createdAt,
                 }
@@ -87,7 +96,7 @@ describe("Comments Repository", () => {
         })
         
         test("list 10 most recent comments for a post", async () => {
-            const comments = await commentsRepository.getMany({postId, limit: 10});
+            const comments = await commentsRepository.getMany({postId, limit: 20});
 
             expect(comments).toBeDefined();
             expect(comments.length).toBe(10);
@@ -103,10 +112,10 @@ describe("Comments Repository", () => {
         });    
 
         test("list 5 most recent comments from a user", async () => {
-            const comments = await commentsRepository.getMany({ userId: authorId, limit: 10 });
+            const comments = await commentsRepository.getMany({ userId: authorId, limit: 20 });
 
             expect(comments).toBeDefined();
-            expect(comments.length).toBe(5);
+            expect(comments.length).toBe(7);
             for (let i = 0; i < comments.length - 1; i++) {
                 const frameStart = i;
                 const frameEnd = i + 1;
@@ -118,9 +127,20 @@ describe("Comments Repository", () => {
             }
         });
 
-        test.todo("list 10 most recent comments from a user on a specific post");
-    });
+        test("list 10 most recent comments from a user on a specific post", async () => {
+            const firstUserCommentsOnPost1 = await commentsRepository.getMany({ userId: authorId, postId: postId, limit: 20 });
+            const secondUserCommentsOnPost1 = await commentsRepository.getMany({ userId: secondUserId, postId: postId, limit: 20 });
 
+            expect(firstUserCommentsOnPost1.length).toBe(5);
+            expect(secondUserCommentsOnPost1.length).toBe(5);
+
+            const firstUserCommentsOnPost2 = await commentsRepository.getMany({ userId: authorId, postId: secondPostId, limit: 20 });
+            const secondUserCommentsOnPost2 = await commentsRepository.getMany({ userId: secondUserId, postId: secondPostId, limit: 20 });
+
+            expect(firstUserCommentsOnPost2.length).toBe(2);
+            expect(secondUserCommentsOnPost2.length).toBe(3);
+        });
+    });
 
     const createMockupPost = async (): Promise<Post> => {
         return await db.orm.public.Posts.create(getMockupPostForCreation(authorId) as Omit<PostForCreation, "tags">);
