@@ -103,7 +103,7 @@ describe("Comments Repository", () => {
         });    
 
         test("list 5 most recent comments from a user", async () => {
-            const comments = await commentsRepository.getMany({ userId: authorId, limit: 5 });
+            const comments = await commentsRepository.getMany({ userId: authorId, limit: 10 });
 
             expect(comments).toBeDefined();
             expect(comments.length).toBe(5);
@@ -118,7 +118,7 @@ describe("Comments Repository", () => {
             }
         });
 
-        test.todo("list 10 most recent comments from a user on a post");    
+        test.todo("list 10 most recent comments from a user on a specific post");
     });
 
 
