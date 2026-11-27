@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, test } from "vitest";
 import { PrismaUserRepository } from "../users/user.repository";
-import { PrismaPostRepository } from "../posts/posts.repository";
 import { clearDb } from "@/utils/database.utils";
 import { getMockupUserForCreation } from "@/mockups/user.mockup";
 import { PrismaCommentsRepository } from "./comments.repository";
@@ -26,6 +25,7 @@ describe("Comments Repository", () => {
         await commentsRepository.create({ postId, userId: authorId, body: "Meu comentário legal"});
         const saved = await db.orm.public.Comments.where({ postId }).select("body").first();
         expect(saved).not.toBeNull();
+        expect(saved!.body).toBe("Meu comentário legal");
     });
 
     test("creates many comments for a post", async () => {
@@ -42,12 +42,15 @@ describe("Comments Repository", () => {
     test("deletes a comment by id", async () => {
         const { id: postId } = await createMockupPost();
 
-        const { id } = await commentsRepository.create({ postId, userId: authorId, body: "Meu comentário legal" });
+        const { id } = await db.orm.public.Comments.create({ postId, userId: authorId, body: "Meu comentário legal" });
         expect(id).toBeDefined();
-        await commentsRepository.delete(id);        
         
-        const saved = await db.orm.public.Comments.where({ postId }).select("body").first();
-        expect(saved).toBeNull();
+        const saved   = await db.orm.public.Comments.where({ postId }).select("body").first();
+        expect(saved).not.toBeNull();
+        
+        await commentsRepository.delete(id);        
+        const deleted = await db.orm.public.Comments.where({ postId }).select("body").first();
+        expect(deleted).toBeNull();
     });
 
     describe("comments listing", () => {
@@ -96,7 +99,7 @@ describe("Comments Repository", () => {
         })
         
         test("list 10 most recent comments for a post", async () => {
-            const comments = await commentsRepository.getMany({postId, limit: 20});
+            const comments = await commentsRepository.getMany({postId, limit: 10});
 
             expect(comments).toBeDefined();
             expect(comments.length).toBe(10);
@@ -111,8 +114,8 @@ describe("Comments Repository", () => {
             }
         });    
 
-        test("list 5 most recent comments from a user", async () => {
-            const comments = await commentsRepository.getMany({ userId: authorId, limit: 20 });
+        test("list 10 most recent comments from a user", async () => {
+            const comments = await commentsRepository.getMany({ userId: authorId, limit: 10 });
 
             expect(comments).toBeDefined();
             expect(comments.length).toBe(7);
@@ -127,15 +130,15 @@ describe("Comments Repository", () => {
             }
         });
 
-        test("list 10 most recent comments from a user on a specific post", async () => {
-            const firstUserCommentsOnPost1 = await commentsRepository.getMany({ userId: authorId, postId: postId, limit: 20 });
-            const secondUserCommentsOnPost1 = await commentsRepository.getMany({ userId: secondUserId, postId: postId, limit: 20 });
+        test("list most recent comments from a user on a specific post", async () => {
+            const firstUserCommentsOnPost1 = await commentsRepository.getMany({ userId: authorId, postId: postId, limit: 10 });
+            const secondUserCommentsOnPost1 = await commentsRepository.getMany({ userId: secondUserId, postId: postId, limit: 10 });
 
             expect(firstUserCommentsOnPost1.length).toBe(5);
             expect(secondUserCommentsOnPost1.length).toBe(5);
 
-            const firstUserCommentsOnPost2 = await commentsRepository.getMany({ userId: authorId, postId: secondPostId, limit: 20 });
-            const secondUserCommentsOnPost2 = await commentsRepository.getMany({ userId: secondUserId, postId: secondPostId, limit: 20 });
+            const firstUserCommentsOnPost2 = await commentsRepository.getMany({ userId: authorId, postId: secondPostId, limit: 10 });
+            const secondUserCommentsOnPost2 = await commentsRepository.getMany({ userId: secondUserId, postId: secondPostId, limit: 10 });
 
             expect(firstUserCommentsOnPost2.length).toBe(2);
             expect(secondUserCommentsOnPost2.length).toBe(3);
